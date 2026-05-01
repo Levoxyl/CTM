@@ -72,6 +72,11 @@ class ThemeViewProvider implements vscode.WebviewViewProvider {
 					vscode.window.showInformationMessage(`Slot ${data.slotId} loaded!`);
 				}
 			}
+			else if (data.type === 'reset') {
+				await config.update('workbench.colorCustomizations', undefined, vscode.ConfigurationTarget.Global);
+				await config.update('editor.tokenColorCustomizations', undefined, vscode.ConfigurationTarget.Global);
+				vscode.window.showInformationMessage("Colors cleared!");
+			}
 		});
 	}
 
@@ -125,6 +130,12 @@ class ThemeViewProvider implements vscode.WebviewViewProvider {
 
 
             <hr style="border: 0.5px solid #000;">
+
+			<div>
+				 <button onclick="send('reset')">
+				<label>Reset</label>
+			</div>
+
             <h3>Presets (Slots)</h3>
             <div style="display: flex; gap: 5px;">
                 <button onclick="send('saveSlot', '1', '')" style="background: #d32f2f; color: white; border: none; padding: 5px; cursor: pointer; flex: 1;">Save 1</button>
@@ -134,7 +145,6 @@ class ThemeViewProvider implements vscode.WebviewViewProvider {
             <script>
                 const vscode = acquireVsCodeApi();
                 function send(type, keyOrScope, color) {
-                    // We send slotId '1' specifically for these buttons
                     vscode.postMessage({ type, scope: keyOrScope, key: keyOrScope, color, slotId: '1' });
                 }
             </script>
