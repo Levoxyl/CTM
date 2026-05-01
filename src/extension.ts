@@ -29,9 +29,32 @@ class ThemeViewProvider implements vscode.WebviewViewProvider {
 				await config.update('workbench.colorCustomizations', { [data.key]: data.color }, vscode.ConfigurationTarget.Global);
 			}
 			else if (data.type === 'updateToken') {
+				const currentConfig: any = config.get('editor.tokenColorCustomizations') || { textMateRules: [] };
+				let rules = currentConfig.textMateRules || [];
+
+				const incomingScopes = data.scope.split(',').map((s: string) => s.trim());
+				rules = rules.filter((rule: any) => !incomingScopes.includes(rule.scope));
+
+				incomingScopes.forEach((scope: string) => {
+					rules.push({
+						"scope": scope,
+						"settings": { "foreground": data.color }
+					});
+				});
+
+				rules.sort((a: any, b: any) => {
+					if (a.scope === 'comment') return 1;
+					if (b.scope === 'comment') return -1;
+					return 0;
+				});
+
+				// 1. Update the actual colors
 				await config.update('editor.tokenColorCustomizations', {
-					"textMateRules": [{ "scope": data.scope, "settings": { "foreground": data.color } }]
+					"textMateRules": rules
 				}, vscode.ConfigurationTarget.Global);
+
+				// 2. Update the semantic setting
+				await config.update('editor.semanticHighlighting.enabled', false, vscode.ConfigurationTarget.Global);
 			}
 			else if (data.type === 'saveSlot') {
 				const currentUI = config.get('workbench.colorCustomizations');
@@ -58,10 +81,50 @@ class ThemeViewProvider implements vscode.WebviewViewProvider {
         <html>
         <body style="padding: 10px; color: white; font-family: sans-serif;">
             <h3>Kill the Rainbow</h3>
-            <input type="color" oninput="send('updateToken', 'keyword', this.value)">
-            <label>Keywords</label>
 
-            <hr style="border: 0.5px solid #444;">
+			<div>
+				<input type="color" oninput="send('updateToken', 'keyword', this.value)">
+				<label>Keywords</label>
+			</div>
+			<div>
+				<input type="color" oninput="send('updateToken', 'string', this.value)">
+				<label>Strings</label>
+			</div>
+			<div>
+				<input type="color" oninput="send('updateToken', 'comment, punctuation.definition.comment', this.value)">
+				<label>Comments</label>
+			</div>
+			<div>
+				<input type="color" oninput="send('updateToken', 'punctuation, keyword.operator', this.value)">
+				<label>Punctuation</label>
+			</div>
+			<div>
+				<input type="color" oninput="send('updateToken', 'entity.name.function', this.value)">
+				<label>Function Names</label>
+			</div>
+			<div>
+				<input type="color" oninput="send('updateToken', 'storage.type', this.value)">
+				<label>Storage Types</label>
+			</div>
+			<div>
+				<input type="color" oninput="send('updateToken', 'storage.modifier', this.value)">
+				<label>Storage Modifiers</label>
+			</div>
+			<div>
+				<input type="color" oninput="send('updateToken', 'variable.other.property, variable.other.object.property, meta.object-literal.key, support.variable.property', this.value)">
+				<label>Variable Properties</label>
+			</div>
+			<div>
+				<input type="color" oninput="send('updateToken', 'support.type', this.value)">
+				<label>Support Types</label>
+			</div>
+			<div>
+				<input type="color" oninput="send('updateToken', 'variable.parameter', this.value)">
+				<label>Variable Parameters</label>
+			</div>
+
+
+            <hr style="border: 0.5px solid #000;">
             <h3>Presets (Slots)</h3>
             <div style="display: flex; gap: 5px;">
                 <button onclick="send('saveSlot', '1', '')" style="background: #d32f2f; color: white; border: none; padding: 5px; cursor: pointer; flex: 1;">Save 1</button>
