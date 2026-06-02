@@ -1,6 +1,6 @@
 # custom-theme-maker README
 
-This is the README for your extension "custom-theme-maker". After writing up a brief description, we recommend including the following sections.
+Custom theme maker is a VSCode customizable theme provider through a side panel operating with different keywords in the code text and VSCode panels and window components to manage a preferable style or look by the user's desire. You can also edit an existing theme ,if it has a styling feature that annoys you and you want to cahnge or get rid of
 
 ## Features
 
