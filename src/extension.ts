@@ -1,66 +1,114 @@
 import * as vscode from 'vscode';
 
-const MASTER_TOKEN_MAP: Record<string, string[]> = {
-    'keywords': [
-        'keyword', 
-        'keyword.control', 
-        'keyword.other', 
-        'keyword.operator.new',
-        'keyword.operator.expression',
-        'storage.type', 
-        'storage.modifier',
-        'constant.language',
-        'variable.language.this'
-    ],
-    'strings': [
-        'string.quoted', 
-        'string.template', 
-        'string.unquoted',
-        'punctuation.definition.string'
-    ],
-    'comments': [
-        'comment', 
-        'punctuation.definition.comment'
-    ],
-    'punctuation': [
-        'punctuation', 
-        'keyword.operator', 
-        'meta.brace', 
-        'punctuation.definition.tag', 
-        'punctuation.separator', 
-        'punctuation.terminator',
-        'meta.tag.jsx',
-        'punctuation.definition.bindingpattern',
-        // Target ONLY the raw structural characters, not the entire block contents
-        'meta.brace.round.js',
-        'meta.brace.curly.js',
-        'punctuation.definition.template-expression'
-    ],
-    'functions': [
-        'entity.name.function', 
-        'support.function',
-        'entity.name.tag', 
-        'support.class.component',
-        'entity.name.type',
-        'support.type',
-        // Specific class & ID selectors for CSS files
-        'entity.other.attribute-name.class.css',
-        'entity.other.attribute-name.id.css'
-    ],
-    'variables': [
-        'variable', 
-        'variable.other', 
-        'variable.parameter', 
-        'variable.other.property', 
-        'meta.object-literal.key',
-        'support.variable',
-        'support.constant',
-        'constant.numeric',
-        'constant.other',
-        'meta.definition.variable',
-        // Targets raw CSS rules properties without hijacking the language syntax
-        'support.type.property-name.css'
-    ]
+interface TokenMapping {
+    textMate: string[];
+    semantic: string[];
+}
+const MASTER_MAP: Record<string, TokenMapping> = {
+    'keywords': {
+        textMate: [
+            'keyword', 
+            'keyword.control', 
+            'keyword.other', 
+            'keyword.operator.new',
+            'keyword.operator.expression',
+            'storage.type', 
+            'storage.modifier',
+            'constant.language',
+            'variable.language.this'
+        ],
+        semantic: ['keyword', 'storage', 'modifier']
+    },
+    'strings': {
+        textMate: [
+            'string.quoted', 
+            'string.template', 
+            'string.unquoted',
+            'punctuation.definition.string'
+        ],
+        semantic: ['string']
+    },
+    'comments': {
+        textMate: [
+            'comment', 
+            'punctuation.definition.comment'
+        ],
+        semantic: ['comment']
+    },
+    'punctuation': {
+        textMate: [
+            'punctuation', 
+            'keyword.operator', 
+            'meta.brace', 
+            'meta.brace.round',
+            'meta.brace.curly',
+            'meta.brace.square',
+            'punctuation.section.block',
+            'punctuation.section.array',
+            'punctuation.section.bracket',
+            'punctuation.definition.object',
+            'punctuation.definition.parameters',
+            'punctuation.definition.bindingpattern',
+            'punctuation.definition.tag', 
+            'punctuation.separator', 
+            'punctuation.terminator',
+            'meta.tag.jsx',
+            'punctuation.definition.template-expression'
+        ],
+        semantic: ['operator'] 
+    },
+    'functions': {
+        textMate: [
+            'entity.name.function', 
+            'support.function',
+            'entity.name.tag',
+            'entity.name.tag.css',
+            'entity.name.tag.html',
+            'meta.tag.sgml',
+            'support.class.component',
+            'entity.name.type',
+            'support.type',
+            'entity.other.attribute-name.class.css',
+            'entity.other.attribute-name.id.css'
+        ],
+        semantic: ['function', 'method', 'member', 'class', 'interface', 'type', 'typeParameter']
+    },
+    'variables': {
+        textMate: [
+            'variable', 
+            'variable.other', 
+            'variable.parameter', 
+            'variable.other.property', 
+            'variable.other.object', 
+            'variable.other.readwrite',
+            'variable.other.readwrite.alias',
+            'variable.other.constant',
+            'meta.object-literal.key',
+            'support.variable',
+            'support.constant',
+            'support.type.object', 
+            'support.constant.dom',
+            'constant.numeric',
+            'constant.other', 
+            'keyword.other.unit', 
+            'entity.other.attribute-name', 
+            'meta.definition.variable',
+            'support.type.property-name.css',
+            'support.constant.property-value.css',
+            'constant.other.color.rgb-value.css',
+            'meta.property-value.css',
+            'meta.property-value.css variable.other'
+        ],
+        semantic: [
+            'variable',
+            'property', 
+            'parameter', 
+            'namespace',
+            'variable.local',
+            'variable.declaration',
+            'variable.readonly'
+        ]
+    }
 };
 
 export function activate(context: vscode.ExtensionContext) {
@@ -91,35 +139,53 @@ class ThemeViewProvider implements vscode.WebviewViewProvider {
             }
             else if (data.type === 'updateToken') {
                 const currentConfig: any = config.get('editor.tokenColorCustomizations') || {};
-                let rules = currentConfig.textMateRules || [];
+                let textMateRules = currentConfig.textMateRules || [];
+                let semanticTokenColors = currentConfig.semanticTokenColors || {};
 
-                const targetScopes = MASTER_TOKEN_MAP[data.scope];
+                const targetMapping = MASTER_MAP[data.scope];
                 
-                if (targetScopes) {
-					// Wipe out any existing rule blocks handling these specific group scopes to prevent clutter
-					rules = rules.filter((rule: any) => {
-						if (!rule.scope) {
-							return true;
-						}
-						const ruleArray = Array.isArray(rule.scope) ? rule.scope : [rule.scope];
-						return !ruleArray.some((s: string) => targetScopes.includes(s));
-					});
+                if (targetMapping) {
+                    textMateRules = textMateRules.filter((rule: any) => {
+                        if (!rule.scope) { 
+                            return true; 
+                        }
+                        const ruleArray = Array.isArray(rule.scope) ? rule.scope : [rule.scope];
+                        return !ruleArray.some((s: string) => targetMapping.textMate.includes(s));
+                    });
 
-                    // Inject the group scopes inside a unified layout block
-                    rules.push({
-                        "scope": targetScopes,
+                    textMateRules.push({
+                        "scope": targetMapping.textMate,
                         "settings": { 
                             "foreground": data.color,
-                            "fontStyle": "" // Forces override over theme transparency/italics inheritance bugs
+                            "fontStyle": "" 
                         }
+                    });
+
+                    targetMapping.semantic.forEach((semanticType) => {
+                        semanticTokenColors[semanticType] = data.color;
                     });
                 }
 
-                await config.update('editor.tokenColorCustomizations', { ...currentConfig, "textMateRules": rules }, vscode.ConfigurationTarget.Workspace);
+                await config.update('editor.tokenColorCustomizations', { 
+                    ...currentConfig, 
+                    "textMateRules": textMateRules,
+                    "semanticTokenColors": semanticTokenColors
+                }, vscode.ConfigurationTarget.Workspace);
 
-                // Disable semantic highlighting and layout engines that interfere with standard colors
-                await config.update('editor.semanticHighlighting.enabled', false, vscode.ConfigurationTarget.Workspace);
-                await config.update('editor.bracketPairColorization.enabled', false, vscode.ConfigurationTarget.Workspace);
+                // FORCE FIX: Direct injection into VS Code's native structural layout engine
+                if (data.scope === 'punctuation') {
+                    const currentUI: any = config.get('workbench.colorCustomizations') || {};
+                    await config.update('workbench.colorCustomizations', {
+                        ...currentUI,
+                        'editorBracketHighlight.foreground1': data.color,
+                        'editorBracketHighlight.foreground2': data.color,
+                        'editorBracketHighlight.foreground3': data.color,
+                        'editorBracketHighlight.foreground4': data.color,
+                        'editorBracketHighlight.foreground5': data.color,
+                        'editorBracketHighlight.foreground6': data.color,
+                        'editorBracketHighlight.unexpectedBracket.foreground': data.color
+                    }, vscode.ConfigurationTarget.Workspace);
+                }
             }
             else if (data.type === 'saveSlot') {
                 const currentUI = config.get('workbench.colorCustomizations');
@@ -140,8 +206,6 @@ class ThemeViewProvider implements vscode.WebviewViewProvider {
                 await config.update('editor.tokenColorCustomizations', undefined, vscode.ConfigurationTarget.Workspace);
                 await config.update('workbench.colorCustomizations', undefined, vscode.ConfigurationTarget.Global);
                 await config.update('editor.tokenColorCustomizations', undefined, vscode.ConfigurationTarget.Global);
-                await config.update('editor.semanticHighlighting.enabled', undefined, vscode.ConfigurationTarget.Workspace);
-                await config.update('editor.bracketPairColorization.enabled', undefined, vscode.ConfigurationTarget.Workspace);
                 vscode.window.showInformationMessage("All colors and global leftovers cleared!");
             }
         });
