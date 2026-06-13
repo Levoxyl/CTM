@@ -19,12 +19,16 @@ const MASTER_MAP: Record<string, TokenMapping> = {
         ],
         semantic: ['keyword', 'storage', 'modifier']
     },
-    'strings': {
+   'strings': {
         textMate: [
             'string.quoted', 
             'string.template', 
             'string.unquoted',
-            'punctuation.definition.string'
+            'punctuation.definition.string',
+            'string.template.js',
+            'string.template.jsx',
+            'string.template.ts',
+            'string.template.tsx'
         ],
         semantic: ['string']
     },
@@ -53,7 +57,13 @@ const MASTER_MAP: Record<string, TokenMapping> = {
             'punctuation.separator', 
             'punctuation.terminator',
             'meta.tag.jsx',
-            'punctuation.definition.template-expression'
+            'punctuation.definition.template-expression',
+            'punctuation.definition.template-expression.begin.ts',
+            'punctuation.definition.template-expression.begin.tsx',
+            'punctuation.definition.template-expression.end.ts',
+            'punctuation.definition.template-expression.end.tsx',
+            'meta.template.expression.ts',
+            'meta.template.expression.tsx'
         ],
         semantic: ['operator'] 
     },
@@ -70,7 +80,6 @@ const MASTER_MAP: Record<string, TokenMapping> = {
             'support.type',
             'entity.other.attribute-name.class.css',
             'entity.other.attribute-name.id.css',
-            // TSX / TS Engine Additions for Promises and Custom Types
             'support.class.builtin.ts',
             'support.class.builtin.tsx',
             'entity.name.type.ts',
@@ -78,11 +87,21 @@ const MASTER_MAP: Record<string, TokenMapping> = {
             'support.type.primitive.ts',
             'support.type.primitive.tsx',
             'support.type.builtin.ts',
-            'support.type.builtin.tsx'
+            'support.type.builtin.tsx',
+            'support.class.builtin.js',
+            'support.class.js',
+            'support.class.ts',
+            'support.class.tsx',
+            'support.type.object.js',
+            'support.type.object.ts',
+            'support.type.object.tsx'
         ],
         semantic: [
             'function', 'method', 'member', 'class', 'interface', 'type', 'typeParameter',
-            'class.declaration', 'interface.declaration', 'type.declaration'
+            'class.declaration', 'interface.declaration', 'type.declaration',
+            'class:defaultLibrary',
+            'interface:defaultLibrary',
+            'type:defaultLibrary'
         ]
     },
     'variables': {
@@ -110,7 +129,6 @@ const MASTER_MAP: Record<string, TokenMapping> = {
             'constant.other.color.rgb-value.css',
             'meta.property-value.css',
             'meta.property-value.css variable.other',
-            // Strict TSX Variable, Destructuring, and Property overrides
             'variable.other.readwrite.ts',
             'variable.other.readwrite.tsx',
             'variable.other.constant.ts',
@@ -134,11 +152,11 @@ const MASTER_MAP: Record<string, TokenMapping> = {
             'variable.local',
             'variable.declaration',
             'variable.readonly',
-            // Catch complex semantic combinations injected by TypeScript Language Server
             'variable.declaration.local',
             'variable.readonly.local',
             'property.declaration',
-            'parameter.declaration'
+            'parameter.declaration',
+            'variable:defaultLibrary'
         ]
     }
 };
