@@ -51,7 +51,7 @@ class ThemeViewProvider implements vscode.WebviewViewProvider {
 				// 1. Update the actual colors
 				await config.update('editor.tokenColorCustomizations', {
 					"textMateRules": rules
-				}, vscode.ConfigurationTarget.Global);
+				}, vscode.ConfigurationTarget.Workspace);
 
 				// 2. Update the semantic setting
 				await config.update('editor.semanticHighlighting.enabled', false, vscode.ConfigurationTarget.Global);
