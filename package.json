@@ -3,33 +3,35 @@
   "displayName": "Custom Theme Maker",
   "description": "Kill the rainbow with a custom live theme editor.",
   "version": "0.0.1",
-  "publisher": "your-name", 
+  "publisher": "your-name",
   "engines": {
     "vscode": "^1.116.0"
   },
-  "categories": ["Other"],
+  "categories": [
+    "Other"
+  ],
   "activationEvents": [],
   "main": "./out/extension.js",
   "contributes": {
-  "viewsContainers": {
-    "activitybar": [
-      {
-        "id": "theme-maker-sidebar",
-        "title": "Custom Theme Maker",
-        "icon": "$(paintcan)"
-      }
-    ]
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "theme-maker-sidebar",
+          "title": "Custom Theme Maker",
+          "icon": "$(paintcan)"
+        }
+      ]
+    },
+    "views": {
+      "theme-maker-sidebar": [
+        {
+          "type": "webview",
+          "id": "theme-maker-view",
+          "name": "Live Theme Editor"
+        }
+      ]
+    }
   },
-  "views": {
-    "theme-maker-sidebar": [
-      {
-        "type": "webview",
-        "id": "theme-maker-view",
-        "name": "Live Theme Editor"
-      }
-    ]
-  }
-},
   "scripts": {
     "vscode:prepublish": "npm run compile",
     "compile": "tsc -p ./",
@@ -40,7 +42,7 @@
   },
   "devDependencies": {
     "@types/mocha": "^10.0.10",
-    "@types/node": "^22.19.17",
+    "@types/node": "^22.19.21",
     "@types/vscode": "^1.116.0",
     "@vscode/test-cli": "^0.0.11",
     "eslint": "^9.39.3",

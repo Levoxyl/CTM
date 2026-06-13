@@ -43,8 +43,8 @@ class ThemeViewProvider implements vscode.WebviewViewProvider {
 				});
 
 				rules.sort((a: any, b: any) => {
-					if (a.scope === 'comment') return 1;
-					if (b.scope === 'comment') return -1;
+					if (a.scope === 'comment') { return 1; }
+					if (b.scope === 'comment') { return -1; }
 					return 0;
 				});
 
