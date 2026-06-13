@@ -26,7 +26,7 @@ class ThemeViewProvider implements vscode.WebviewViewProvider {
 			const config = vscode.workspace.getConfiguration();
 
 			if (data.type === 'updateColor') {
-				await config.update('workbench.colorCustomizations', { [data.key]: data.color }, vscode.ConfigurationTarget.Global);
+				await config.update('workbench.colorCustomizations', { [data.key]: data.color }, vscode.ConfigurationTarget.Workspace);
 			}
 			else if (data.type === 'updateToken') {
 				const currentConfig: any = config.get('editor.tokenColorCustomizations') || { textMateRules: [] };
@@ -54,7 +54,7 @@ class ThemeViewProvider implements vscode.WebviewViewProvider {
 				}, vscode.ConfigurationTarget.Workspace);
 
 				// 2. Update the semantic setting
-				await config.update('editor.semanticHighlighting.enabled', false, vscode.ConfigurationTarget.Global);
+				await config.update('editor.semanticHighlighting.enabled', false, vscode.ConfigurationTarget.Workspace);
 			}
 			else if (data.type === 'saveSlot') {
 				const currentUI = config.get('workbench.colorCustomizations');
@@ -67,14 +67,14 @@ class ThemeViewProvider implements vscode.WebviewViewProvider {
 			else if (data.type === 'loadSlot') {
 				const saved: any = this._context.globalState.get(`slot_${data.slotId}`);
 				if (saved) {
-					await config.update('workbench.colorCustomizations', saved.ui, vscode.ConfigurationTarget.Global);
-					await config.update('editor.tokenColorCustomizations', saved.tokens, vscode.ConfigurationTarget.Global);
+					await config.update('workbench.colorCustomizations', saved.ui, vscode.ConfigurationTarget.Workspace);
+					await config.update('editor.tokenColorCustomizations', saved.tokens, vscode.ConfigurationTarget.Workspace);
 					vscode.window.showInformationMessage(`Slot ${data.slotId} loaded!`);
 				}
 			}
 			else if (data.type === 'reset') {
-				await config.update('workbench.colorCustomizations', undefined, vscode.ConfigurationTarget.Global);
-				await config.update('editor.tokenColorCustomizations', undefined, vscode.ConfigurationTarget.Global);
+				await config.update('workbench.colorCustomizations', undefined, vscode.ConfigurationTarget.Workspace);
+				await config.update('editor.tokenColorCustomizations', undefined, vscode.ConfigurationTarget.Workspace);
 				vscode.window.showInformationMessage("Colors cleared!");
 			}
 		});
@@ -144,9 +144,28 @@ class ThemeViewProvider implements vscode.WebviewViewProvider {
 
             <script>
                 const vscode = acquireVsCodeApi();
+
                 function send(type, keyOrScope, color) {
-                    vscode.postMessage({ type, scope: keyOrScope, key: keyOrScope, color, slotId: '1' });
-                }
+					if (color) {
+						// Find which input index triggered the event and save it
+						const inputs = Array.from(document.querySelectorAll('input[type="color"]'));
+						const index = inputs.findIndex(el => el.value === color);
+						if (index !== -1) {
+							state[index] = color;
+							vscode.setState(state);
+						}
+					} else if (type === 'reset') {
+						state = {};
+						vscode.setState(state);
+					}
+					vscode.postMessage({ type, scope: keyOrScope, key: keyOrScope, color, slotId: '1' });
+				}
+
+				let state = vscode.getState() || {};
+
+				document.querySelectorAll('input[type="color"]').forEach((el, index) => {
+					if (state[index]) el.value = state[index];
+				});
             </script>
         </body>
         </html>`;
