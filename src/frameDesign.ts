@@ -1,3 +1,5 @@
+// frameDesign.ts
+
 export interface UIZoneMapping {
     name: string;
     description: string;
@@ -5,81 +7,80 @@ export interface UIZoneMapping {
 }
 
 export const FRAME_MAP: Record<string, UIZoneMapping> = {
-    'leftPanel': {
-        name: 'Left Panel (Sidebar)',
-        description: 'Controls the primary sidebar container background, badges, and its selection items.',
-        workbenchKeys: [
-            'sideBar.background',
-            'sideBar.foreground',
-            'sideBar.border',
-            'sideBarTitle.foreground',
-            'activityBar.background',
-            'activityBar.foreground',
-            'activityBar.inactiveForeground',
-            'activityBar.border',
-            'activityBarBadge.background',
-            'activityBarBadge.foreground'
-        ]
+    'activityBar': {
+        name: 'Left Panel L (Icon Strip Background)',
+        description: 'Background surface for the far left icon column.',
+        workbenchKeys: ['activityBar.background', 'activityBar.border']
     },
-    'rightPanel': {
-        name: 'Right Panel (Auxiliary Bar)',
-        description: 'Controls the secondary right-hand sidebar panels.',
+    'sideBar': {
+        name: 'Left Panel R (Explorer Background)',
+        description: 'Background surface for the file tree and folders window.',
         workbenchKeys: [
-            'auxiliaryBar.background',
-            'auxiliaryBar.foreground',
-            'auxiliaryBar.border',
-            'auxiliaryBarTitle.foreground'
+            'sideBar.background', 
+            'sideBar.border', 
+            'sideBarSectionHeader.background', 
+            'sideBarSectionHeader.border'
         ]
     },
     'topPanel': {
-        name: 'Top Panel & Global Search',
-        description: 'Controls the layout header, window title controls, and global search widgets.',
-        workbenchKeys: [
-            'titleBar.activeBackground',
-            'titleBar.activeForeground',
-            'titleBar.border',
-            'searchEditor.textInputBorder',
-            'input.background',
-            'input.foreground',
-            'input.border'
-        ]
+        name: 'Top Panel Background',
+        description: 'Background for the window title and top search layout.',
+        workbenchKeys: ['titleBar.activeBackground', 'titleBar.border', 'input.background']
     },
     'bottomPanel': {
-        name: 'Bottom Panel & Status Bar',
-        description: 'Controls the status container metadata bar and embedded output panels.',
-        workbenchKeys: [
-            'statusBar.background',
-            'statusBar.foreground',
-            'statusBar.border',
-            'statusBar.debuggingBackground',
-            'statusBar.debuggingForeground',
-            'statusBarItem.hoverBackground',
-            'panel.background',
-            'panel.border',
-            'panelTitle.activeForeground',
-            'panelTitle.inactiveForeground'
-        ]
+        name: 'Bottom Bar & Panels Background',
+        description: 'Background surface for the status bar and bottom output/terminal panels.',
+        workbenchKeys: ['statusBar.background', 'statusBar.border', 'panel.background', 'panel.border']
     },
     'editorBackground': {
-        name: 'Code Editor Canvas',
-        description: 'Alters the layout backdrop surface color behind text frames.',
+        name: 'Code Editor Canvas Background',
+        description: 'Main coding window canvas backdrop surface.',
         workbenchKeys: [
-            'editor.background',
-            'editorLayout.background',
-            'breadcrumb.background',
-            'editorGroupHeader.tabsBackground'
+            'editor.background', 
+            'editorLayout.background', 
+            'breadcrumb.background', 
+            'editorGroupHeader.tabsBackground',
+            'tab.inactiveBackground',
+            'tab.activeBackground'
         ]
     },
-    'editorGutter': {
-        name: 'Editor Line Numbers & Font Margin',
-        description: 'Customizes line coordinates, font offsets, and side breakpoints.',
+    // NEW ISOLATED TEXT / UI UTILITY PICKS
+    'uiGeneralText': {
+        name: 'UI Interactive General Text',
+        description: 'Global text typography elements across sidebars, files tree, and layout tabs.',
+        workbenchKeys: [
+            'sideBar.foreground',
+            'sideBarTitle.foreground',
+            'sideBarSectionHeader.foreground',
+            'titleBar.activeForeground',
+            'panelTitle.activeForeground',
+            'panelTitle.inactiveForeground',
+            'tab.activeForeground',
+            'tab.inactiveForeground',
+            'input.foreground',
+            'list.hoverForeground',
+            'list.activeSelectionForeground'
+        ]
+    },
+    'uiIconsAndVectors': {
+        name: 'UI System Action Icons',
+        description: 'SVG Vector elements, activity bar indicators, and layout badges.',
+        workbenchKeys: [
+            'activityBar.foreground',
+            'activityBar.inactiveForeground',
+            'activityBarBadge.background',
+            'activityBarBadge.foreground',
+            'tree.indentGuidesStroke',
+            'statusBar.foreground',
+            'statusBar.debuggingForeground'
+        ]
+    },
+    'editorLineNumbers': {
+        name: 'Editor Line Numbers Typography',
+        description: 'Isolates the actual code line indexing numbers running down the gutter.',
         workbenchKeys: [
             'editorLineNumber.foreground',
-            'editorLineNumber.activeForeground',
-            'editorGutter.background',
-            'editorGutter.modifiedBackground',
-            'editorGutter.addedBackground',
-            'editorGutter.deletedBackground'
+            'editorLineNumber.activeForeground'
         ]
     }
 };

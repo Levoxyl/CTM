@@ -114,35 +114,43 @@ class ThemeViewProvider implements vscode.WebviewViewProvider {
         return `
         <!DOCTYPE html>
         <html>
-        <body style="padding: 10px; color: white; font-family: sans-serif;">
-            
-            <h3 style="margin-top: 0;">1. Structural Frame Design</h3>
+		<h3 style="margin-top: 0; color: #64b5f6;">1a. Layout Frame Backgrounds</h3>
             <div style="margin-bottom: 8px;">
-                <input type="color" oninput="send('updateFrame', 'leftPanel', this.value)">
-                <label style="margin-left: 5px;">Left Panel & Tabs</label>
+                <input type="color" oninput="send('updateFrame', 'activityBar', this.value)">
+                <label style="margin-left: 5px;">Left Panel L Background</label>
             </div>
             <div style="margin-bottom: 8px;">
-                <input type="color" oninput="send('updateFrame', 'rightPanel', this.value)">
-                <label style="margin-left: 5px;">Right Panel</label>
+                <input type="color" oninput="send('updateFrame', 'sideBar', this.value)">
+                <label style="margin-left: 5px;">Left Panel R Background</label>
             </div>
             <div style="margin-bottom: 8px;">
                 <input type="color" oninput="send('updateFrame', 'topPanel', this.value)">
-                <label style="margin-left: 5px;">Top Search Bar</label>
+                <label style="margin-left: 5px;">Top Header Background</label>
             </div>
             <div style="margin-bottom: 8px;">
                 <input type="color" oninput="send('updateFrame', 'bottomPanel', this.value)">
-                <label style="margin-left: 5px;">Bottom Bar & Panels</label>
+                <label style="margin-left: 5px;">Bottom Frame Background</label>
             </div>
-            <div style="margin-bottom: 8px;">
+            <div style="margin-bottom: 12px;">
                 <input type="color" oninput="send('updateFrame', 'editorBackground', this.value)">
-                <label style="margin-left: 5px;">Editor Background</label>
-            </div>
-            <div style="margin-bottom: 15px;">
-                <input type="color" oninput="send('updateFrame', 'editorGutter', this.value)">
-                <label style="margin-left: 5px;">Line Numbers Margin</label>
+                <label style="margin-left: 5px;">Code Canvas Background</label>
             </div>
 
-            <hr style="border: 0.5px solid #444; margin: 15px 0;">
+            <h3 style="margin-top: 10px; color: #81c784;">1b. Core Interface Typography & Icons</h3>
+            <div style="margin-bottom: 8px;">
+                <input type="color" oninput="send('updateFrame', 'uiGeneralText', this.value)">
+                <label style="margin-left: 5px;">UI Panel Text & Menus</label>
+            </div>
+            <div style="margin-bottom: 8px;">
+                <input type="color" oninput="send('updateFrame', 'uiIconsAndVectors', this.value)">
+                <label style="margin-left: 5px;">System Action Icons (SVG)</label>
+            </div>
+            <div style="margin-bottom: 15px;">
+                <input type="color" oninput="send('updateFrame', 'editorLineNumbers', this.value)">
+                <label style="margin-left: 5px;">Gutter Line Numbers</label>
+            </div>
+
+            <hr style="border: 0.5px solid #ffffff; margin: 15px 0;">
 
             <h3>2. Text Token Colorizer</h3>
             <div style="margin-bottom: 8px;">
@@ -170,7 +178,7 @@ class ThemeViewProvider implements vscode.WebviewViewProvider {
                 <label style="margin-left: 5px;">Variables, Props & Values</label>
             </div>
 
-            <hr style="border: 0.5px solid #444; margin: 15px 0;">
+            <hr style="border: 0.5px solid #ffffff; margin: 15px 0;">
 
             <div style="margin-bottom: 15px;">
                 <button onclick="send('reset')" style="width: 100%; background: #555; color: white; border: none; padding: 6px; cursor: pointer;">Reset Theme</button>
