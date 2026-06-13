@@ -69,9 +69,21 @@ const MASTER_MAP: Record<string, TokenMapping> = {
             'entity.name.type',
             'support.type',
             'entity.other.attribute-name.class.css',
-            'entity.other.attribute-name.id.css'
+            'entity.other.attribute-name.id.css',
+            // TSX / TS Engine Additions for Promises and Custom Types
+            'support.class.builtin.ts',
+            'support.class.builtin.tsx',
+            'entity.name.type.ts',
+            'entity.name.type.tsx',
+            'support.type.primitive.ts',
+            'support.type.primitive.tsx',
+            'support.type.builtin.ts',
+            'support.type.builtin.tsx'
         ],
-        semantic: ['function', 'method', 'member', 'class', 'interface', 'type', 'typeParameter']
+        semantic: [
+            'function', 'method', 'member', 'class', 'interface', 'type', 'typeParameter',
+            'class.declaration', 'interface.declaration', 'type.declaration'
+        ]
     },
     'variables': {
         textMate: [
@@ -97,7 +109,22 @@ const MASTER_MAP: Record<string, TokenMapping> = {
             'support.constant.property-value.css',
             'constant.other.color.rgb-value.css',
             'meta.property-value.css',
-            'meta.property-value.css variable.other'
+            'meta.property-value.css variable.other',
+            // Strict TSX Variable, Destructuring, and Property overrides
+            'variable.other.readwrite.ts',
+            'variable.other.readwrite.tsx',
+            'variable.other.constant.ts',
+            'variable.other.constant.tsx',
+            'variable.other.property.ts',
+            'variable.other.property.tsx',
+            'variable.parameter.ts',
+            'variable.parameter.tsx',
+            'meta.object-literal.key.ts',
+            'meta.object-literal.key.tsx',
+            'entity.other.attribute-name.tsx',
+            'entity.other.attribute-name.jsx',
+            'variable.other.object.ts',
+            'variable.other.object.tsx'
         ],
         semantic: [
             'variable',
@@ -106,7 +133,12 @@ const MASTER_MAP: Record<string, TokenMapping> = {
             'namespace',
             'variable.local',
             'variable.declaration',
-            'variable.readonly'
+            'variable.readonly',
+            // Catch complex semantic combinations injected by TypeScript Language Server
+            'variable.declaration.local',
+            'variable.readonly.local',
+            'property.declaration',
+            'parameter.declaration'
         ]
     }
 };
