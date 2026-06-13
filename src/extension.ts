@@ -33,7 +33,13 @@ class ThemeViewProvider implements vscode.WebviewViewProvider {
 				let rules = currentConfig.textMateRules || [];
 
 				const incomingScopes = data.scope.split(',').map((s: string) => s.trim());
-				rules = rules.filter((rule: any) => !incomingScopes.includes(rule.scope));
+				rules = rules.filter((rule: any) => {
+					if (!rule.scope) return false;
+					const ruleScopes = typeof rule.scope === 'string' 
+						? rule.scope.split(',').map((s: string) => s.trim()) 
+						: Array.isArray(rule.scope) ? rule.scope : [rule.scope];
+					return !ruleScopes.some((s: string) => incomingScopes.includes(s));
+				});
 
 				incomingScopes.forEach((scope: string) => {
 					rules.push({
@@ -73,9 +79,15 @@ class ThemeViewProvider implements vscode.WebviewViewProvider {
 				}
 			}
 			else if (data.type === 'reset') {
+				// Wipe Workspace layer
 				await config.update('workbench.colorCustomizations', undefined, vscode.ConfigurationTarget.Workspace);
 				await config.update('editor.tokenColorCustomizations', undefined, vscode.ConfigurationTarget.Workspace);
-				vscode.window.showInformationMessage("Colors cleared!");
+				
+				// Wipe lingering Global overrides from previous versions
+				await config.update('workbench.colorCustomizations', undefined, vscode.ConfigurationTarget.Global);
+				await config.update('editor.tokenColorCustomizations', undefined, vscode.ConfigurationTarget.Global);
+				
+				vscode.window.showInformationMessage("All colors and global leftovers cleared!");
 			}
 		});
 	}
@@ -88,11 +100,11 @@ class ThemeViewProvider implements vscode.WebviewViewProvider {
             <h3>Kill the Rainbow</h3>
 
 			<div>
-				<input type="color" oninput="send('updateToken', 'keyword', this.value)">
+				<input type="color" oninput="send('updateToken', 'keyword, keyword.control, keyword.other, keyword.control.flow, keyword.control.import, constant.language', this.value)">
 				<label>Keywords</label>
 			</div>
 			<div>
-				<input type="color" oninput="send('updateToken', 'string', this.value)">
+				<input type="color" oninput="send('updateToken', 'string, string.quoted, string.template, punctuation.definition.string', this.value)">
 				<label>Strings</label>
 			</div>
 			<div>
@@ -100,11 +112,11 @@ class ThemeViewProvider implements vscode.WebviewViewProvider {
 				<label>Comments</label>
 			</div>
 			<div>
-				<input type="color" oninput="send('updateToken', 'punctuation, keyword.operator', this.value)">
+				<input type="color" oninput="send('updateToken', 'punctuation, keyword.operator, meta.brace, punctuation.definition.tag, punctuation.separator, punctuation.terminator, punctuation.definition.bindingpattern, punctuation.definition.template-expression, meta.tag.jsx, expression.embedded.jsx', this.value)">
 				<label>Punctuation</label>
 			</div>
 			<div>
-				<input type="color" oninput="send('updateToken', 'entity.name.function', this.value)">
+				<input type="color" oninput="send('updateToken', 'entity.name.function, entity.name.tag, support.class.component', this.value)">
 				<label>Function Names</label>
 			</div>
 			<div>
@@ -124,7 +136,7 @@ class ThemeViewProvider implements vscode.WebviewViewProvider {
 				<label>Support Types</label>
 			</div>
 			<div>
-				<input type="color" oninput="send('updateToken', 'variable.parameter', this.value)">
+				<input type="color" oninput="send('updateToken', 'variable.parameter, variable.parameter.function, variable.parameter.arrow, variable.parameter.destructuring, meta.object-binding-pattern', this.value)">
 				<label>Variable Parameters</label>
 			</div>
 
@@ -144,28 +156,27 @@ class ThemeViewProvider implements vscode.WebviewViewProvider {
 
             <script>
                 const vscode = acquireVsCodeApi();
+				let state = vscode.getState() || {};
 
-                function send(type, keyOrScope, color) {
+				document.querySelectorAll('input[type="color"]').forEach((el, index) => {
+					el.dataset.idx = index; 
+					if (state[index]) el.value = state[index];
+				});
+
+				function send(type, keyOrScope, color) {
 					if (color) {
-						// Find which input index triggered the event and save it
-						const inputs = Array.from(document.querySelectorAll('input[type="color"]'));
-						const index = inputs.findIndex(el => el.value === color);
-						if (index !== -1) {
-							state[index] = color;
+						const activeEl = document.activeElement;
+						if (activeEl && activeEl.dataset.idx !== undefined) {
+							state[activeEl.dataset.idx] = color;
 							vscode.setState(state);
 						}
 					} else if (type === 'reset') {
 						state = {};
 						vscode.setState(state);
+						document.querySelectorAll('input[type="color"]').forEach(el => el.value = '#000000');
 					}
 					vscode.postMessage({ type, scope: keyOrScope, key: keyOrScope, color, slotId: '1' });
 				}
-
-				let state = vscode.getState() || {};
-
-				document.querySelectorAll('input[type="color"]').forEach((el, index) => {
-					if (state[index]) el.value = state[index];
-				});
             </script>
         </body>
         </html>`;
