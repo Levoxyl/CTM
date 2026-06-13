@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import { MASTER_MAP } from './tokenMap';
+import { FRAME_MAP } from './frameDesign'; // Safely imported structural map
 
 export function activate(context: vscode.ExtensionContext) {
     const provider = new ThemeViewProvider(context);
@@ -24,8 +25,19 @@ class ThemeViewProvider implements vscode.WebviewViewProvider {
         webviewView.webview.onDidReceiveMessage(async (data) => {
             const config = vscode.workspace.getConfiguration();
 
-            if (data.type === 'updateColor') {
-                await config.update('workbench.colorCustomizations', { [data.key]: data.color }, vscode.ConfigurationTarget.Workspace);
+            // Catch the UI structural frame modifications
+            if (data.type === 'updateFrame') {
+                const currentUI: any = config.get('workbench.colorCustomizations') || {};
+                const targetFrame = FRAME_MAP[data.scope];
+
+                if (targetFrame) {
+                    // Update all design tokens allocated to this specific block framework
+                    targetFrame.workbenchKeys.forEach((key) => {
+                        currentUI[key] = data.color;
+                    });
+
+                    await config.update('workbench.colorCustomizations', currentUI, vscode.ConfigurationTarget.Workspace);
+                }
             }
             else if (data.type === 'updateToken') {
                 const currentConfig: any = config.get('editor.tokenColorCustomizations') || {};
@@ -36,9 +48,7 @@ class ThemeViewProvider implements vscode.WebviewViewProvider {
                 
                 if (targetMapping) {
                     textMateRules = textMateRules.filter((rule: any) => {
-                        if (!rule.scope) { 
-                            return true; 
-                        }
+                        if (!rule.scope) return true; 
                         const ruleArray = Array.isArray(rule.scope) ? rule.scope : [rule.scope];
                         return !ruleArray.some((s: string) => targetMapping.textMate.includes(s));
                     });
@@ -62,7 +72,6 @@ class ThemeViewProvider implements vscode.WebviewViewProvider {
                     "semanticTokenColors": semanticTokenColors
                 }, vscode.ConfigurationTarget.Workspace);
 
-                // FORCE FIX: Direct injection into VS Code's native structural layout engine
                 if (data.scope === 'punctuation') {
                     const currentUI: any = config.get('workbench.colorCustomizations') || {};
                     await config.update('workbench.colorCustomizations', {
@@ -106,8 +115,36 @@ class ThemeViewProvider implements vscode.WebviewViewProvider {
         <!DOCTYPE html>
         <html>
         <body style="padding: 10px; color: white; font-family: sans-serif;">
-            <h3>Kill the Rainbow</h3>
+            
+            <h3 style="margin-top: 0;">1. Structural Frame Design</h3>
+            <div style="margin-bottom: 8px;">
+                <input type="color" oninput="send('updateFrame', 'leftPanel', this.value)">
+                <label style="margin-left: 5px;">Left Panel & Tabs</label>
+            </div>
+            <div style="margin-bottom: 8px;">
+                <input type="color" oninput="send('updateFrame', 'rightPanel', this.value)">
+                <label style="margin-left: 5px;">Right Panel</label>
+            </div>
+            <div style="margin-bottom: 8px;">
+                <input type="color" oninput="send('updateFrame', 'topPanel', this.value)">
+                <label style="margin-left: 5px;">Top Search Bar</label>
+            </div>
+            <div style="margin-bottom: 8px;">
+                <input type="color" oninput="send('updateFrame', 'bottomPanel', this.value)">
+                <label style="margin-left: 5px;">Bottom Bar & Panels</label>
+            </div>
+            <div style="margin-bottom: 8px;">
+                <input type="color" oninput="send('updateFrame', 'editorBackground', this.value)">
+                <label style="margin-left: 5px;">Editor Background</label>
+            </div>
+            <div style="margin-bottom: 15px;">
+                <input type="color" oninput="send('updateFrame', 'editorGutter', this.value)">
+                <label style="margin-left: 5px;">Line Numbers Margin</label>
+            </div>
 
+            <hr style="border: 0.5px solid #444; margin: 15px 0;">
+
+            <h3>2. Text Token Colorizer</h3>
             <div style="margin-bottom: 8px;">
                 <input type="color" oninput="send('updateToken', 'keywords', this.value)">
                 <label style="margin-left: 5px;">Keywords & Storage</label>
@@ -133,7 +170,7 @@ class ThemeViewProvider implements vscode.WebviewViewProvider {
                 <label style="margin-left: 5px;">Variables, Props & Values</label>
             </div>
 
-            <hr style="border: 0.5px solid #444; margin-bottom: 15px;">
+            <hr style="border: 0.5px solid #444; margin: 15px 0;">
 
             <div style="margin-bottom: 15px;">
                 <button onclick="send('reset')" style="width: 100%; background: #555; color: white; border: none; padding: 6px; cursor: pointer;">Reset Theme</button>
@@ -149,6 +186,7 @@ class ThemeViewProvider implements vscode.WebviewViewProvider {
                 const vscode = acquireVsCodeApi();
                 let state = vscode.getState() || {};
 
+                // Map input index persistence smoothly 
                 document.querySelectorAll('input[type="color"]').forEach((el, index) => {
                     el.dataset.idx = index; 
                     if (state[index]) el.value = state[index];
