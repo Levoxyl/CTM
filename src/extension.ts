@@ -1,23 +1,30 @@
 import * as vscode from 'vscode';
 
-		const MASTER_TOKEN_MAP: Record<string, string[]> = {
-			'keywords': ['keyword', 'keyword.control', 'keyword.other', 'keyword.control.flow', 'keyword.control.import', 'constant.language', 'variable.language'],
-			'strings': ['string', 'string.quoted', 'string.template', 'punctuation.definition.string', 'string.unquoted'],
-			'comments': ['comment', 'punctuation.definition.comment'],
-			'punctuation': [
-				'punctuation', 'keyword.operator', 'meta.brace', 'punctuation.definition.tag', 
-				'punctuation.separator', 'punctuation.terminator', 'punctuation.definition.bindingpattern', 
-				'punctuation.definition.template-expression', 'meta.tag.jsx', 'expression.embedded.jsx',
-				'meta.brace.round', 'meta.brace.square', 'meta.brace.curly', 
-				'punctuation.definition.parameters', 'punctuation.definition.block', 'punctuation.definition.arguments'
-			],
-			'functions': ['entity.name.function', 'entity.name.tag', 'support.class.component', 'meta.function-call'],
-			'storage.type': ['storage.type'],
-			'storage.modifier': ['storage.modifier'],
-			'properties': ['variable.other.property', 'variable.other.object.property', 'meta.object-literal.key', 'support.variable.property'],
-			'types': ['support.type', 'entity.name.type'],
-			'parameters': ['variable.parameter', 'variable.parameter.function', 'variable.parameter.arrow', 'variable.parameter.destructuring', 'meta.object-binding-pattern', 'variable.other.readwrite']
-		};
+const MASTER_TOKEN_MAP: Record<string, string[]> = {
+    'keywords': [
+        'keyword', 'keyword.control', 'keyword.other', 'keyword.control.flow', 
+        'keyword.control.import', 'constant.language', 'variable.language',
+        'storage.type', 'storage.modifier'
+    ],
+    'strings': ['string', 'string.quoted', 'string.template', 'punctuation.definition.string', 'string.unquoted'],
+    'comments': ['comment', 'punctuation.definition.comment'],
+    'punctuation': [
+        'punctuation', 'keyword.operator', 'meta.brace', 'punctuation.definition.tag', 
+        'punctuation.separator', 'punctuation.terminator', 'punctuation.definition.bindingpattern', 
+        'punctuation.definition.template-expression', 'meta.tag.jsx', 'expression.embedded.jsx',
+        'meta.brace.round', 'meta.brace.square', 'meta.brace.curly', 
+        'punctuation.definition.parameters', 'punctuation.definition.block', 'punctuation.definition.arguments'
+    ],
+    'functions': ['entity.name.function', 'entity.name.tag', 'support.class.component', 'meta.function-call', 'support.type', 'entity.name.type'],
+    'variables': [
+        'variable', 'variable.other', 'variable.other.readwrite', 'variable.parameter', 
+        'variable.parameter.function', 'variable.parameter.arrow', 'variable.parameter.destructuring',
+        'variable.other.property', 'variable.other.object.property', 'meta.object-literal.key', 
+        'support.variable.property', 'entity.other.attribute-name',
+        'support.class', 'support.type.object', 'support.constant', 'support.variable',
+        'constant.numeric'
+    ]
+};
 
 export function activate(context: vscode.ExtensionContext) {
 	const provider = new ThemeViewProvider(context);
@@ -118,9 +125,9 @@ class ThemeViewProvider implements vscode.WebviewViewProvider {
         <body style="padding: 10px; color: white; font-family: sans-serif;">
             <h3>Kill the Rainbow</h3>
 
-<div>
+			<div>
                 <input type="color" oninput="send('updateToken', 'keywords', this.value)">
-                <label>Keywords</label>
+                <label>Keywords & Storage (const, let, export)</label>
             </div>
             <div>
                 <input type="color" oninput="send('updateToken', 'strings', this.value)">
@@ -132,33 +139,16 @@ class ThemeViewProvider implements vscode.WebviewViewProvider {
             </div>
             <div>
                 <input type="color" oninput="send('updateToken', 'punctuation', this.value)">
-                <label>Punctuation</label>
+                <label>Punctuation & Operators</label>
             </div>
             <div>
                 <input type="color" oninput="send('updateToken', 'functions', this.value)">
-                <label>Function Names</label>
+                <label>Functions & Types</label>
             </div>
             <div>
-                <input type="color" oninput="send('updateToken', 'storage.type', this.value)">
-                <label>Storage Types</label>
+                <input type="color" oninput="send('updateToken', 'variables', this.value)">
+                <label>Variables, Properties & Numbers (ctx, document, 512)</label>
             </div>
-            <div>
-                <input type="color" oninput="send('updateToken', 'storage.modifier', this.value)">
-                <label>Storage Modifiers</label>
-            </div>
-            <div>
-                <input type="color" oninput="send('updateToken', 'properties', this.value)">
-                <label>Variable Properties</label>
-            </div>
-            <div>
-                <input type="color" oninput="send('updateToken', 'types', this.value)">
-                <label>Support Types</label>
-            </div>
-            <div>
-                <input type="color" oninput="send('updateToken', 'parameters', this.value)">
-                <label>Variable Parameters</label>
-            </div>
-
 
             <hr style="border: 0.5px solid #000;">
 
