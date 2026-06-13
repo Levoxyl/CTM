@@ -1,5 +1,24 @@
 import * as vscode from 'vscode';
 
+		const MASTER_TOKEN_MAP: Record<string, string[]> = {
+			'keywords': ['keyword', 'keyword.control', 'keyword.other', 'keyword.control.flow', 'keyword.control.import', 'constant.language', 'variable.language'],
+			'strings': ['string', 'string.quoted', 'string.template', 'punctuation.definition.string', 'string.unquoted'],
+			'comments': ['comment', 'punctuation.definition.comment'],
+			'punctuation': [
+				'punctuation', 'keyword.operator', 'meta.brace', 'punctuation.definition.tag', 
+				'punctuation.separator', 'punctuation.terminator', 'punctuation.definition.bindingpattern', 
+				'punctuation.definition.template-expression', 'meta.tag.jsx', 'expression.embedded.jsx',
+				'meta.brace.round', 'meta.brace.square', 'meta.brace.curly', 
+				'punctuation.definition.parameters', 'punctuation.definition.block', 'punctuation.definition.arguments'
+			],
+			'functions': ['entity.name.function', 'entity.name.tag', 'support.class.component', 'meta.function-call'],
+			'storage.type': ['storage.type'],
+			'storage.modifier': ['storage.modifier'],
+			'properties': ['variable.other.property', 'variable.other.object.property', 'meta.object-literal.key', 'support.variable.property'],
+			'types': ['support.type', 'entity.name.type'],
+			'parameters': ['variable.parameter', 'variable.parameter.function', 'variable.parameter.arrow', 'variable.parameter.destructuring', 'meta.object-binding-pattern', 'variable.other.readwrite']
+		};
+
 export function activate(context: vscode.ExtensionContext) {
 	const provider = new ThemeViewProvider(context);
 
@@ -22,6 +41,7 @@ class ThemeViewProvider implements vscode.WebviewViewProvider {
 
 		webviewView.webview.html = this._getHtmlForWebview();
 
+
 		webviewView.webview.onDidReceiveMessage(async (data) => {
 			const config = vscode.workspace.getConfiguration();
 
@@ -32,7 +52,7 @@ class ThemeViewProvider implements vscode.WebviewViewProvider {
 				const currentConfig: any = config.get('editor.tokenColorCustomizations') || { textMateRules: [] };
 				let rules = currentConfig.textMateRules || [];
 
-				const incomingScopes = data.scope.split(',').map((s: string) => s.trim());
+				const incomingScopes = MASTER_TOKEN_MAP[data.scope] || data.scope.split(',').map((s: string) => s.trim());
 				rules = rules.filter((rule: any) => {
 					if (!rule.scope) return false;
 					const ruleScopes = typeof rule.scope === 'string' 
@@ -54,13 +74,11 @@ class ThemeViewProvider implements vscode.WebviewViewProvider {
 					return 0;
 				});
 
-				// 1. Update the actual colors
-				await config.update('editor.tokenColorCustomizations', {
-					"textMateRules": rules
-				}, vscode.ConfigurationTarget.Workspace);
+				await config.update('editor.tokenColorCustomizations', { "textMateRules": rules }, vscode.ConfigurationTarget.Workspace);
 
-				// 2. Update the semantic setting
+				// Disable modern engine interference overrides
 				await config.update('editor.semanticHighlighting.enabled', false, vscode.ConfigurationTarget.Workspace);
+				await config.update('editor.bracketPairColorization.enabled', false, vscode.ConfigurationTarget.Workspace);
 			}
 			else if (data.type === 'saveSlot') {
 				const currentUI = config.get('workbench.colorCustomizations');
@@ -79,13 +97,14 @@ class ThemeViewProvider implements vscode.WebviewViewProvider {
 				}
 			}
 			else if (data.type === 'reset') {
-				// Wipe Workspace layer
 				await config.update('workbench.colorCustomizations', undefined, vscode.ConfigurationTarget.Workspace);
 				await config.update('editor.tokenColorCustomizations', undefined, vscode.ConfigurationTarget.Workspace);
-				
-				// Wipe lingering Global overrides from previous versions
 				await config.update('workbench.colorCustomizations', undefined, vscode.ConfigurationTarget.Global);
 				await config.update('editor.tokenColorCustomizations', undefined, vscode.ConfigurationTarget.Global);
+				
+				// Restore default editor engines
+				await config.update('editor.semanticHighlighting.enabled', undefined, vscode.ConfigurationTarget.Workspace);
+				await config.update('editor.bracketPairColorization.enabled', undefined, vscode.ConfigurationTarget.Workspace);
 				
 				vscode.window.showInformationMessage("All colors and global leftovers cleared!");
 			}
@@ -99,46 +118,46 @@ class ThemeViewProvider implements vscode.WebviewViewProvider {
         <body style="padding: 10px; color: white; font-family: sans-serif;">
             <h3>Kill the Rainbow</h3>
 
-			<div>
-				<input type="color" oninput="send('updateToken', 'keyword, keyword.control, keyword.other, keyword.control.flow, keyword.control.import, constant.language', this.value)">
-				<label>Keywords</label>
-			</div>
-			<div>
-				<input type="color" oninput="send('updateToken', 'string, string.quoted, string.template, punctuation.definition.string', this.value)">
-				<label>Strings</label>
-			</div>
-			<div>
-				<input type="color" oninput="send('updateToken', 'comment, punctuation.definition.comment', this.value)">
-				<label>Comments</label>
-			</div>
-			<div>
-				<input type="color" oninput="send('updateToken', 'punctuation, keyword.operator, meta.brace, punctuation.definition.tag, punctuation.separator, punctuation.terminator, punctuation.definition.bindingpattern, punctuation.definition.template-expression, meta.tag.jsx, expression.embedded.jsx', this.value)">
-				<label>Punctuation</label>
-			</div>
-			<div>
-				<input type="color" oninput="send('updateToken', 'entity.name.function, entity.name.tag, support.class.component', this.value)">
-				<label>Function Names</label>
-			</div>
-			<div>
-				<input type="color" oninput="send('updateToken', 'storage.type', this.value)">
-				<label>Storage Types</label>
-			</div>
-			<div>
-				<input type="color" oninput="send('updateToken', 'storage.modifier', this.value)">
-				<label>Storage Modifiers</label>
-			</div>
-			<div>
-				<input type="color" oninput="send('updateToken', 'variable.other.property, variable.other.object.property, meta.object-literal.key, support.variable.property', this.value)">
-				<label>Variable Properties</label>
-			</div>
-			<div>
-				<input type="color" oninput="send('updateToken', 'support.type', this.value)">
-				<label>Support Types</label>
-			</div>
-			<div>
-				<input type="color" oninput="send('updateToken', 'variable.parameter, variable.parameter.function, variable.parameter.arrow, variable.parameter.destructuring, meta.object-binding-pattern', this.value)">
-				<label>Variable Parameters</label>
-			</div>
+<div>
+                <input type="color" oninput="send('updateToken', 'keywords', this.value)">
+                <label>Keywords</label>
+            </div>
+            <div>
+                <input type="color" oninput="send('updateToken', 'strings', this.value)">
+                <label>Strings</label>
+            </div>
+            <div>
+                <input type="color" oninput="send('updateToken', 'comments', this.value)">
+                <label>Comments</label>
+            </div>
+            <div>
+                <input type="color" oninput="send('updateToken', 'punctuation', this.value)">
+                <label>Punctuation</label>
+            </div>
+            <div>
+                <input type="color" oninput="send('updateToken', 'functions', this.value)">
+                <label>Function Names</label>
+            </div>
+            <div>
+                <input type="color" oninput="send('updateToken', 'storage.type', this.value)">
+                <label>Storage Types</label>
+            </div>
+            <div>
+                <input type="color" oninput="send('updateToken', 'storage.modifier', this.value)">
+                <label>Storage Modifiers</label>
+            </div>
+            <div>
+                <input type="color" oninput="send('updateToken', 'properties', this.value)">
+                <label>Variable Properties</label>
+            </div>
+            <div>
+                <input type="color" oninput="send('updateToken', 'types', this.value)">
+                <label>Support Types</label>
+            </div>
+            <div>
+                <input type="color" oninput="send('updateToken', 'parameters', this.value)">
+                <label>Variable Parameters</label>
+            </div>
 
 
             <hr style="border: 0.5px solid #000;">
