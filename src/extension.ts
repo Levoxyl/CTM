@@ -136,7 +136,7 @@ class ThemeViewProvider implements vscode.WebviewViewProvider {
                 <label style="margin-left: 5px;">Code Canvas Background</label>
             </div>
 
-            <h3 style="margin-top: 10px; color: #81c784;">1b. Core Interface Typography & Icons</h3>
+           <h3 style="margin-top: 10px; color: #81c784;">1b. Core Interface Typography & Icons</h3>
             <div style="margin-bottom: 8px;">
                 <input type="color" oninput="send('updateFrame', 'uiGeneralText', this.value)">
                 <label style="margin-left: 5px;">UI Panel Text & Menus</label>
@@ -145,9 +145,13 @@ class ThemeViewProvider implements vscode.WebviewViewProvider {
                 <input type="color" oninput="send('updateFrame', 'uiIconsAndVectors', this.value)">
                 <label style="margin-left: 5px;">System Action Icons (SVG)</label>
             </div>
-            <div style="margin-bottom: 15px;">
+            <div style="margin-bottom: 8px;">
                 <input type="color" oninput="send('updateFrame', 'editorLineNumbers', this.value)">
                 <label style="margin-left: 5px;">Gutter Line Numbers</label>
+            </div>
+            <div style="margin-bottom: 15px;">
+                <input type="color" oninput="send('updateFrame', 'uiInteractiveStates', this.value)">
+                <label style="margin-left: 5px;">UI Selections, Hovers & Menus</label>
             </div>
 
             <hr style="border: 0.5px solid #ffffff; margin: 15px 0;">
