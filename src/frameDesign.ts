@@ -32,7 +32,8 @@ export const FRAME_MAP: Record<string, UIZoneMapping> = {
             'terminal.background',
             'badge.background',
             'activityBarBadge.background',
-            'statusBarItem.remoteBackground'
+            'statusBarItem.remoteBackground',
+            'statusBarItem.prominentBackground',
         ]
     },
     'editorBackground': {
@@ -53,9 +54,20 @@ export const FRAME_MAP: Record<string, UIZoneMapping> = {
             'diffEditor.headerBackground',
             'multiDiffEditor.headerBackground',
             'diffEditorStickyScroll.background',
+            'diffEditor.insertedTextBackground',
+            'diffEditor.insertedTextBorder',
+            'diffEditor.removedTextBackground',
+            'diffEditor.removedTextBorder',
+            'diffEditor.insertedLineBackground',
+            'diffEditor.removedLineBackground',
             'merge.headerBackground',
             'editorGutter.background',
-            'minimap.background', 
+            'editorGutter.addedBackground',
+            'editorGutter.modifiedBackground',
+            'editorGutter.deletedBackground',
+            'minimapGutter.addedBackground',
+            'minimapGutter.modifiedBackground',
+            'minimapGutter.deletedBackground',
             'editorOverviewRuler.background'
         ]
     },
@@ -125,6 +137,23 @@ export const FRAME_MAP: Record<string, UIZoneMapping> = {
             'statusBar.debuggingForeground',
             'statusBar.noFolderForeground',
             'statusBarItem.remoteForeground',
+            'statusBarItem.prominentForeground',
+            'textLink.foreground',
+            'textLink.activeForeground',
+            'textPreformat.foreground',
+            'button.foreground',
+            //experimental
+            'debugTokenExpression.name',
+            'debugTokenExpression.value',
+            'debugTokenExpression.string',
+            'debugTokenExpression.boolean',
+            'debugTokenExpression.number',
+            'debugTokenExpression.error',
+            'debugView.stateLabelForeground',
+            'debugConsole.warningForeground',
+            'debugConsole.errorForeground',
+            
+            
         ]
     },
     'uiLayoutBorders': {
@@ -191,7 +220,9 @@ export const FRAME_MAP: Record<string, UIZoneMapping> = {
             'editorIndentGuide.background3',
             'editorIndentGuide.activeBackground1',
             'editorIndentGuide.activeBackground2',
-            'editorIndentGuide.activeBackground3',    
+            'editorIndentGuide.activeBackground3',
+            
+            'debugToolBar.border',
         ]
     },
     'uiInteractiveStates': {
@@ -253,6 +284,17 @@ export const FRAME_MAP: Record<string, UIZoneMapping> = {
             'statusBarItem.activeBackground',
             'statusBarItem.prominentHoverBackground',
             'statusBarItem.remoteHoverBackground',
+            'button.background',
+            'button.foreground',
+            'button.hoverBackground',
+            'button.separator',
+            'checkbox.background',
+            'checkbox.foreground',
+            'checkbox.border',
+            'checkbox.selectBackground',
+            'checkbox.selectBorder',
+
+            'debugToolBar.background',
         ]
     },
     'uiIconsAndVectors': {
