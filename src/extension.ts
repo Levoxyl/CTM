@@ -44,7 +44,12 @@ class ThemeViewProvider implements vscode.WebviewViewProvider {
                         currentUI[key] = data.color;        
                     } else if (key === 'activityBar.inactiveForeground') {
                         currentUI[key] = data.color + '99';
-                    } else {
+                    } 
+                    // 🟢 ADD THIS CONDITION BELOW TO AUTOMATICALLY FADE DISABLED BUTTONS/TEXT
+                    else if (key.toLowerCase().includes('disabled') || key.endsWith('placeholderForeground')) {
+                        currentUI[key] = data.color + '66'; // Appends ~40% opacity to preserve look & feel
+                    } 
+                    else {
                         currentUI[key] = data.color;
                     }
                 });

@@ -293,8 +293,11 @@ export const FRAME_MAP: Record<string, UIZoneMapping> = {
             'checkbox.border',
             'checkbox.selectBackground',
             'checkbox.selectBorder',
-
             'debugToolBar.background',
+            'inputOption.activeBackground',
+            'inputOption.activeBorder',
+            'inputOption.activeForeground',
+            'toolbar.hoverOutline',
         ]
     },
     'uiIconsAndVectors': {
