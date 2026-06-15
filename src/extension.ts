@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import { MASTER_MAP } from './tokenMap';
-import { FRAME_MAP } from './frameDesign'; // Safely imported structural map
+import { FRAME_MAP } from './frameDesign'; 
 
 export function activate(context: vscode.ExtensionContext) {
     const provider = new ThemeViewProvider(context);
@@ -25,17 +25,14 @@ class ThemeViewProvider implements vscode.WebviewViewProvider {
         webviewView.webview.onDidReceiveMessage(async (data) => {
             const config = vscode.workspace.getConfiguration();
 
-            // Catch the UI structural frame modifications
             if (data.type === 'updateFrame') {
                 const currentUI: any = config.get('workbench.colorCustomizations') || {};
                 const targetFrame = FRAME_MAP[data.scope];
 
                 if (targetFrame) {
-                    // Update all design tokens allocated to this specific block framework
                     targetFrame.workbenchKeys.forEach((key) => {
                         currentUI[key] = data.color;
                     });
-
                     await config.update('workbench.colorCustomizations', currentUI, vscode.ConfigurationTarget.Workspace);
                 }
             }
@@ -114,7 +111,8 @@ class ThemeViewProvider implements vscode.WebviewViewProvider {
         return `
         <!DOCTYPE html>
         <html>
-		<h3 style="margin-top: 0; color: #64b5f6;">1a. Layout Frame Backgrounds</h3>
+        <body>
+        <h3 style="margin-top: 0; color: #64b5f6;">1a. Layout Frame Backgrounds</h3>
             <div style="margin-bottom: 8px;">
                 <input type="color" oninput="send('updateFrame', 'activityBar', this.value)">
                 <label style="margin-left: 5px;">Left Panel L Background</label>
@@ -136,22 +134,25 @@ class ThemeViewProvider implements vscode.WebviewViewProvider {
                 <label style="margin-left: 5px;">Code Canvas Background</label>
             </div>
 
-           <h3 style="margin-top: 10px; color: #81c784;">1b. Core Interface Typography & Icons</h3>
-            <div style="margin-bottom: 8px;">
+        <h3 style="margin-top: 10px; color: #81c784;">1b. Core Interface Typography & Icons</h3>
+            <div class="control-group" style="margin-bottom: 8px;">
                 <input type="color" oninput="send('updateFrame', 'uiGeneralText', this.value)">
-                <label style="margin-left: 5px;">UI Panel Text & Menus</label>
+                <label style="margin-left: 5px;">UI Text, Menus & Gutter Lines</label>
             </div>
-            <div style="margin-bottom: 8px;">
+
+            <div class="control-group" style="margin-bottom: 8px;">
                 <input type="color" oninput="send('updateFrame', 'uiIconsAndVectors', this.value)">
                 <label style="margin-left: 5px;">System Action Icons (SVG)</label>
             </div>
-            <div style="margin-bottom: 8px;">
-                <input type="color" oninput="send('updateFrame', 'editorLineNumbers', this.value)">
-                <label style="margin-left: 5px;">Gutter Line Numbers</label>
+
+            <div class="control-group" style="margin-bottom: 8px;">
+                <input type="color" oninput="send('updateFrame', 'uiLayoutBorders', this.value)">
+                <label style="margin-left: 5px;">Layout Separators & Borders</label>
             </div>
-            <div style="margin-bottom: 15px;">
+
+            <div class="control-group" style="margin-bottom: 8px;">
                 <input type="color" oninput="send('updateFrame', 'uiInteractiveStates', this.value)">
-                <label style="margin-left: 5px;">UI Selections, Hovers & Menus</label>
+                <label style="margin-left: 5px;">Selections, Hovers & Menus</label>
             </div>
 
             <hr style="border: 0.5px solid #ffffff; margin: 15px 0;">
@@ -198,7 +199,6 @@ class ThemeViewProvider implements vscode.WebviewViewProvider {
                 const vscode = acquireVsCodeApi();
                 let state = vscode.getState() || {};
 
-                // Map input index persistence smoothly 
                 document.querySelectorAll('input[type="color"]').forEach((el, index) => {
                     el.dataset.idx = index; 
                     if (state[index]) el.value = state[index];
@@ -206,9 +206,11 @@ class ThemeViewProvider implements vscode.WebviewViewProvider {
 
                 function send(type, keyOrScope, color) {
                     if (color) {
-                        const activeEl = document.activeElement;
-                        if (activeEl && activeEl.dataset.idx !== undefined) {
-                            state[activeEl.dataset.idx] = color;
+                        const targetEl = Array.from(document.querySelectorAll('input[type="color"]'))
+                            .find(el => el.getAttribute('oninput')?.includes(keyOrScope));
+                            
+                        if (targetEl && targetEl.dataset.idx !== undefined) {
+                            state[targetEl.dataset.idx] = color;
                             vscode.setState(state);
                         }
                     } else if (type === 'reset') {

@@ -10,68 +10,52 @@ export const FRAME_MAP: Record<string, UIZoneMapping> = {
     'activityBar': {
         name: 'Left Panel L (Icon Strip Background)',
         description: 'Background surface for the far left icon column.',
-        workbenchKeys: ['activityBar.background', 'activityBar.border']
+        workbenchKeys: ['activityBar.background']
     },
     'sideBar': {
         name: 'Left Panel R (Explorer Background)',
-        description: 'Background surface for the file tree and folders window.',
-        workbenchKeys: [
-            'sideBar.background', 
-            'sideBar.border', 
-            'sideBarSectionHeader.background', 
-            'sideBarSectionHeader.border'
-        ]
+        description: 'Background surface for the file tree, solutions, and C# Dev Kit views.',
+        workbenchKeys: ['sideBar.background', 'sideBarSectionHeader.background']
     },
     'topPanel': {
         name: 'Top Panel Background',
         description: 'Background for the window title and top search layout.',
-        workbenchKeys: [
-            'titleBar.activeBackground', 
-            'titleBar.inactiveBackground', 
-            'titleBar.border', 
-            'input.background'
-        ]
+        workbenchKeys: ['titleBar.activeBackground', 'titleBar.inactiveBackground', 'input.background']
     },
     'bottomPanel': {
         name: 'Bottom Bar & Panels Background',
         description: 'Background surface for the status bar and bottom output/terminal panels.',
         workbenchKeys: [
             'statusBar.background', 
-            'statusBar.border', 
             'statusBar.debuggingBackground',
             'statusBar.noFolderBackground',
             'panel.background', 
-            'panel.border',
             'panelSectionHeader.background',
             'terminal.background',
-            'terminal.border',
             'badge.background',
             'activityBarBadge.background'
         ]
     },
     'editorBackground': {
         name: 'Code Editor Canvas Background',
-        description: 'Main coding window canvas backdrop surface.',
+        description: 'Main coding window canvas backdrop surface and context overlays.',
         workbenchKeys: [
             'editor.background', 
             'editorLayout.background', 
             'breadcrumb.background', 
             'editorGroupHeader.tabsBackground',
-            'editorGroupHeader.tabsBorder',
-            'editorGroupHeader.border',
             'tab.activeBackground', 
             'tab.inactiveBackground',
             'tab.unfocusedActiveBackground',
             'tab.unfocusedInactiveBackground',
             'editorGutter.background',
-            'editorStickyScroll.background',
-            'editorStickyScroll.border',
-            'editorStickyScrollHover.background'
+            'editorStickyScroll.background',       
+            'editorStickyScrollHover.background'   
         ]
     },
     'uiGeneralText': {
-        name: 'UI Interactive General Text',
-        description: 'Global text typography elements across sidebars, files tree, and layout tabs.',
+        name: 'UI Panel Text, Menus & Gutter Numbers',
+        description: 'Global text typography elements across windows, sidebars, context menus, and editor line numbers.',
         workbenchKeys: [
             'foreground', 
             'sideBar.foreground',
@@ -103,25 +87,27 @@ export const FRAME_MAP: Record<string, UIZoneMapping> = {
             'combobox.foreground',
             'menu.foreground',
             'menu.selectionForeground',
-
-            // ==========================================
-            // EXSTENSIVE STATE FIXES FOR INACTIVE ITEMS
-            // ==========================================
-            'disabledForeground',                   // Global fallback for disabled interface elements
-            'menu.disabledForeground',              // Fixes grayed out context items (Save All, Go/Run actions)
-            'list.disabledForeground',              // Fixes disabled sidebar interactions
-            'menu.shortcutForeground',              // Makes keyboard shortcuts listed in menus completely readable
-            'list.secondaryForeground',             // Fixes subtext/file paths in search dialog boxes
-            'input.placeholderForeground',          // Fixes pale prompt text inside search inputs
-            'breadcrumb.foreground',                // Top code path track layout text
-            'breadcrumb.focusForeground',           
-            'breadcrumb.activeSelectionForeground'
+            'disabledForeground',                    
+            'menu.disabledForeground',              
+            'list.disabledForeground',              
+            'menu.shortcutForeground',              
+            'list.secondaryForeground',             
+            'input.placeholderForeground',          
+            'breadcrumb.foreground',                
+            'breadcrumb.focusForeground',            
+            'breadcrumb.activeSelectionForeground',
+            'list.deemphasizedItems.foreground',    
+            'gitDecoration.ignoredResourceForeground', 
+            'gitDecoration.submoduleResourceForeground',
+            'editorLineNumber.foreground',
+            'editorLineNumber.activeForeground'
         ]
     },
     'uiIconsAndVectors': {
         name: 'UI System Action Icons',
         description: 'SVG Vector elements, activity bar indicators, and layout badges.',
         workbenchKeys: [
+            'icon.foreground',                                     
             'activityBar.foreground',
             'activityBar.inactiveForeground',
             'tree.indentGuidesStroke',
@@ -130,24 +116,56 @@ export const FRAME_MAP: Record<string, UIZoneMapping> = {
             'activityBar.activeBorder'
         ]
     },
-    'editorLineNumbers': {
-        name: 'Editor Line Numbers Typography',
-        description: 'Isolates the actual code line indexing numbers running down the gutter.',
+    'uiLayoutBorders': {
+        name: 'UI Layout Borders & Form Fields',
+        description: 'Isolates structural frames, bottom borders, window split lines, and panel input fields.',
         workbenchKeys: [
-            'editorLineNumber.foreground',
-            'editorLineNumber.activeForeground'
+            'activityBar.border',
+            'sideBar.border',
+            'sideBarSectionHeader.border',
+            'titleBar.border',
+            'panel.border',
+            'panelSectionHeader.border',
+            'panelSection.border',
+            'terminal.border',
+            'editorGroupHeader.tabsBorder',
+            'editorGroupHeader.border',
+            'editorStickyScroll.border',
+            'tab.border',                                           
+            'tab.inactiveBorder',
+            'statusBar.border',
+            'statusBar.debuggingBorder',
+            'statusBar.noFolderBorder',
+            'sash.hoverBorder',                                     
+            'window.activeBorder',
+            'menu.border',
+            'widget.border',
+            'input.border',                                         
+            'panelInput.border',
+            'dropdown.border',
+            'selectBox.border',
+            'combobox.border',
+            'pickerGroup.border',
+            'settings.dropdownBorder',
+            'settings.checkboxBorder',
+            'settings.textInputBorder',
+            'focusBorder'                                           
         ]
     },
     'uiInteractiveStates': {
         name: 'UI Selection, Hovers & Menus',
-        description: 'Forces selection block updates, dropdown fields, and app menu highlights.',
+        description: 'Forces selection block updates, falling autocompletion menus, dropdown fields, and app highlights.',
         workbenchKeys: [
             'list.hoverBackground',
             'list.activeSelectionBackground',
             'list.inactiveSelectionBackground',
             'list.focusBackground',
+            'list.focusOutline',
             'editor.lineHighlightBackground',
+            'editor.lineHighlightBorder',
             'editor.selectionBackground',
+            'editor.inactiveSelectionBackground',
+            'editor.selectionHighlightBackground',
             'tab.hoverBackground',
             'tab.unfocusedHoverBackground',
             'panelTitle.activeBorder', 
@@ -155,21 +173,20 @@ export const FRAME_MAP: Record<string, UIZoneMapping> = {
             'tab.activeBorderTop',
             'quickInput.background',
             'quickInputList.focusBackground',
-            'pickerGroup.border',
             'dropdown.background',
-            'dropdown.border',
             'dropdown.listBackground',
             'selectBox.background',
-            'selectBox.border',
             'combobox.background',
-            'combobox.border',
-            'window.activeBorder',
             'menubar.selectionBackground',
             'menu.background',
             'menu.selectionBackground',
-            'menu.border',
             'menu.separatorBackground',
-            'widget.border',
+            'editorSuggestWidget.background',
+            'editorSuggestWidget.border',
+            'editorSuggestWidget.foreground',
+            'editorSuggestWidget.selectedBackground',
+            'editorSuggestWidget.highlightForeground',
+            'editorSuggestWidget.focusHighlightForeground',
             'widget.shadow',
             'toolbar.hoverBackground',
             'toolbar.activeBackground',
@@ -180,11 +197,8 @@ export const FRAME_MAP: Record<string, UIZoneMapping> = {
             'settings.headerForeground',
             'settings.modifiedItemIndicator',
             'settings.dropdownBackground',
-            'settings.dropdownBorder',
             'settings.checkboxBackground',
-            'settings.checkboxBorder',
-            'settings.textInputBackground',
-            'settings.textInputBorder'
+            'settings.textInputBackground'
         ]
     }
 };
