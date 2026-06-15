@@ -116,7 +116,14 @@ export const FRAME_MAP: Record<string, UIZoneMapping> = {
             'gitDecoration.modifiedResourceForeground',    
             'gitDecoration.untrackedResourceForeground',   
             'gitDecoration.deletedResourceForeground',     
-            'gitDecoration.conflictingResourceForeground'  
+            'gitDecoration.conflictingResourceForeground',
+
+            // FIXES FOR SEARCHBARS & CONSOLE GREY TEXT
+            'editorWidget.foreground',             // Fixes text inside floating Find/Replace/Search widget boxes
+            'commandCenter.foreground',            // Fixes main text in top header search bar layout 
+            'commandCenter.activeForeground',      // Fixes top search text when clicked/focused
+            'debugConsole.infoForeground',         // Fixes standard console/log text stream output
+            'debugConsole.sourceForeground'        // Fixes source file references inside console streams
         ]
     },
     'uiIconsAndVectors': {
