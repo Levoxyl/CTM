@@ -1,5 +1,3 @@
-// frameDesign.ts
-
 export interface UIZoneMapping {
     name: string;
     description: string;
@@ -33,7 +31,8 @@ export const FRAME_MAP: Record<string, UIZoneMapping> = {
             'panelSectionHeader.background',
             'terminal.background',
             'badge.background',
-            'activityBarBadge.background'
+            'activityBarBadge.background',
+            'statusBarItem.remoteBackground'
         ]
     },
     'editorBackground': {
@@ -52,14 +51,12 @@ export const FRAME_MAP: Record<string, UIZoneMapping> = {
             'editorStickyScroll.background',       
             'editorStickyScrollHover.background',
             'diffEditor.headerBackground',
-            'multiDiffEditor.headerBackground',          // FIX: Handles multi-file differences top headers
+            'multiDiffEditor.headerBackground',
             'diffEditorStickyScroll.background',
             'merge.headerBackground',
-            'editorGutter.background',                   // FIX: Prevents gutter track from staying black
-            
-            // BACKDROP SURFACES FOR THE SCROLL BAR TRACK & MINIMAP
-            'minimap.background',                        // Entire minimap structural strip background
-            'editorOverviewRuler.background'             // Core right hand vertical scroll runway strip
+            'editorGutter.background',
+            'minimap.background', 
+            'editorOverviewRuler.background'
         ]
     },
     'uiGeneralText': {
@@ -106,6 +103,7 @@ export const FRAME_MAP: Record<string, UIZoneMapping> = {
             'breadcrumb.activeSelectionForeground',
             'list.deemphasizedItems.foreground',    
             'tooltip.foreground',
+            'editorHoverWidget.foreground',
             'list.secondaryForeground',
             'keybindingLabel.foreground',
             'editorLineNumber.foreground',
@@ -117,40 +115,16 @@ export const FRAME_MAP: Record<string, UIZoneMapping> = {
             'gitDecoration.untrackedResourceForeground',   
             'gitDecoration.deletedResourceForeground',     
             'gitDecoration.conflictingResourceForeground',
-
-            // FIXES FOR SEARCHBARS & CONSOLE GREY TEXT
-            'editorWidget.foreground',             // Fixes text inside floating Find/Replace/Search widget boxes
-            'commandCenter.foreground',            // Fixes main text in top header search bar layout 
-            'commandCenter.activeForeground',      // Fixes top search text when clicked/focused
-            'debugConsole.infoForeground',         // Fixes standard console/log text stream output
-            'debugConsole.sourceForeground'        // Fixes source file references inside console streams
-        ]
-    },
-    'uiIconsAndVectors': {
-        name: 'UI System Action Icons',
-        description: 'SVG Vector elements, activity bar indicators, and layout badges.',
-        workbenchKeys: [
-            'icon.foreground',                                     
-            'activityBar.foreground',
-            'activityBar.inactiveForeground',
-            'tree.indentGuidesStroke',
+            'editor.foreground',
+            'editorWidget.foreground', 
+            'commandCenter.foreground', 
+            'commandCenter.activeForeground', 
+            'debugConsole.infoForeground', 
+            'debugConsole.sourceForeground',
             'statusBar.foreground',
             'statusBar.debuggingForeground',
-            'activityBar.activeBorder',
-            
-            // FIX: Modern VS Code multi-level indent guide tracks
-            'editorIndentGuide.background1',
-            'editorIndentGuide.background2',
-            'editorIndentGuide.background3',
-            'editorIndentGuide.background4',
-            'editorIndentGuide.background5',
-            'editorIndentGuide.background6',
-            'editorIndentGuide.activeBackground1',
-            'editorIndentGuide.activeBackground2',
-            'editorIndentGuide.activeBackground3',
-            'editorIndentGuide.activeBackground4',
-            'editorIndentGuide.activeBackground5',
-            'editorIndentGuide.activeBackground6'
+            'statusBar.noFolderForeground',
+            'statusBarItem.remoteForeground',
         ]
     },
     'uiLayoutBorders': {
@@ -168,16 +142,16 @@ export const FRAME_MAP: Record<string, UIZoneMapping> = {
             'editorGroupHeader.tabsBorder',
             'editorGroupHeader.border',
             'editorStickyScroll.border',
-            'tab.border',                                                                                                                                                                                                            
+            'tab.border',                                                                                                                                                                                                                                                                                                
             'tab.inactiveBorder',
             'statusBar.border',
             'statusBar.debuggingBorder',
             'statusBar.noFolderBorder',
-            'sash.hoverBorder',                                                                                                                                                                                                     
+            'sash.hoverBorder',                                                                                                                                                                                                                                                                                       
             'window.activeBorder',
             'menu.border',
             'widget.border',
-            'inputOption.activeBorder',                                                                                                                                                                                                         
+            'inputOption.activeBorder',                                                                                                                                                                                                                                                                                       
             'panelInput.border',
             'dropdown.border',
             'selectBox.border',
@@ -187,6 +161,7 @@ export const FRAME_MAP: Record<string, UIZoneMapping> = {
             'settings.checkboxBorder',
             'diffEditor.border',
             'tooltip.border',
+            'editorHoverWidget.border',
             'focusBorder',
             'sideBySideEditor.verticalBorder',
             'sideBySideEditor.horizontalBorder',
@@ -208,7 +183,15 @@ export const FRAME_MAP: Record<string, UIZoneMapping> = {
             'minimapSlider.background',           
             'minimapSlider.hoverBackground',      
             'minimapSlider.activeBackground',     
-            'editorOverviewRuler.border'          
+            'editorOverviewRuler.border',
+            'editorIndentGuide.background',
+            'editorIndentGuide.activeBackground',
+            'editorIndentGuide.background1',
+            'editorIndentGuide.background2',
+            'editorIndentGuide.background3',
+            'editorIndentGuide.activeBackground1',
+            'editorIndentGuide.activeBackground2',
+            'editorIndentGuide.activeBackground3',    
         ]
     },
     'uiInteractiveStates': {
@@ -260,11 +243,25 @@ export const FRAME_MAP: Record<string, UIZoneMapping> = {
             'settings.checkboxBackground',
             'settings.textInputBackground',
             'tooltip.background',
+            'editorHoverWidget.background',
+            'editorHoverWidget.statusBarBackground',
+            'editorWidget.background',                
             'keybindingLabel.background',
-            
-            // FIX: Linked bracket frame indicators mapped here
             'editorBracketMatch.background',
-            'editorBracketMatch.border'
+            'editorBracketMatch.border',
+            'statusBarItem.hoverBackground',
+            'statusBarItem.activeBackground',
+            'statusBarItem.prominentHoverBackground',
+            'statusBarItem.remoteHoverBackground',
         ]
-    }
+    },
+    'uiIconsAndVectors': {
+        name: 'System Action Icons (SVG)',
+        description: 'Applies colors to core product icons, view headers, and activity bar item states.',
+        workbenchKeys: [
+            'icon.foreground',
+            'activityBar.foreground', 
+            'activityBar.inactiveForeground' 
+        ]
+    },
 };

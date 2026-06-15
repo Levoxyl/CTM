@@ -1,7 +1,7 @@
-// extension.ts
 import * as vscode from 'vscode';
 import { MASTER_MAP } from './tokenMap';
 import { FRAME_MAP } from './frameDesign'; 
+import { getAdaptiveGitColor, getLuminance } from './colorUtils';
 
 export function activate(context: vscode.ExtensionContext) {
     const provider = new ThemeViewProvider(context);
@@ -32,32 +32,54 @@ class ThemeViewProvider implements vscode.WebviewViewProvider {
 
                 if (targetFrame) {
                     targetFrame.workbenchKeys.forEach((key) => {
-                        if (key.endsWith('Slider.background')) {
-                            currentUI[key] = data.color + '40'; // 25% opacity
-                        } else if (key.endsWith('Slider.hoverBackground')) {
-                            currentUI[key] = data.color + '66'; // 40% opacity on hover 
-                        } else if (key.endsWith('Slider.activeBackground')) {
-                            currentUI[key] = data.color + '80'; // 50% opacity on click drag
-                        } else if (key === 'editorLineNumber.foreground') {
-                            currentUI[key] = data.color + '55'; // 33% alpha tint so regular line numbers stay subtle
-                        } else if (key === 'editorLineNumber.activeForeground') {
-                            currentUI[key] = data.color;        // 100% full opacity pop on the current active line
-                        } else if (key.startsWith('editorIndentGuide.background')) {
-                            currentUI[key] = data.color + '40'; // FIX: Subtle alpha blend for dormant indent guides
-                        } else if (key.startsWith('editorIndentGuide.activeBackground')) {
-                            currentUI[key] = data.color + 'cc'; // FIX: Brighter opacity focus for current line scope
-                        } else if (key === 'editorBracketMatch.background') {
-                            currentUI[key] = data.color + '33'; // FIX: Handle opacity background behind bracket frames
-                        } else if (key === 'editorBracketMatch.border') {
-                            currentUI[key] = data.color;        // FIX: High visibility solid frame border
-                        } else {
-                            currentUI[key] = data.color;
-                        }
-                    });
+                    if (key.endsWith('Slider.background')) {
+                        currentUI[key] = data.color + '40'; 
+                    } else if (key.endsWith('Slider.hoverBackground')) {
+                        currentUI[key] = data.color + '66'; 
+                    } else if (key.endsWith('Slider.activeBackground')) {
+                        currentUI[key] = data.color + '80'; 
+                    } else if (key === 'editorLineNumber.foreground') {
+                        currentUI[key] = data.color + '55'; 
+                    } else if (key === 'editorLineNumber.activeForeground') {
+                        currentUI[key] = data.color;        
+                    } else if (key === 'activityBar.inactiveForeground') {
+                        currentUI[key] = data.color + '99';
+                    } else {
+                        currentUI[key] = data.color;
+                    }
+                });
+                    // if (data.scope === 'editorBackground' || data.scope === 'uiInteractiveStates') { 
+                    const referenceBg = currentUI['editor.background'] || data.color;
+                    if (referenceBg) { 
+                        const isDarkBg = getLuminance(referenceBg) < 0.5;
+                        const inheritedForeground = currentUI['foreground'] || (isDarkBg ? '#ffffff' : '#111111');
+                        
+                        currentUI['tooltip.background'] = referenceBg;
+                        currentUI['editorHoverWidget.background'] = referenceBg;
+                        currentUI['editorHoverWidget.statusBarBackground'] = referenceBg;
+                        currentUI['editorWidget.background'] = referenceBg;
+                        currentUI['tooltip.foreground'] = inheritedForeground;
+                        currentUI['editorHoverWidget.foreground'] = inheritedForeground;
+
+                        const gitAddition = getAdaptiveGitColor(referenceBg, 'addition');
+                        const gitDeletion = getAdaptiveGitColor(referenceBg, 'deletion');
+                        const gitModified = isDarkBg ? '#e9c46a' : '#b58900';
+                        currentUI['gitDecoration.addedResourceForeground'] = gitAddition;
+                        currentUI['gitDecoration.deletedResourceForeground'] = gitDeletion;
+                        currentUI['gitDecoration.modifiedResourceForeground'] = gitModified;
+                        
+                        currentUI['editorGutter.addedBackground'] = gitAddition;
+                        currentUI['editorGutter.deletedBackground'] = gitDeletion;
+                        currentUI['editorGutter.modifiedBackground'] = gitModified;
+                        currentUI['diffEditor.insertedTextBackground'] = gitAddition + '33';
+                        currentUI['diffEditor.removedTextBackground'] = gitDeletion + '33';
+                        currentUI['diffEditor.insertedLineBackground'] = gitAddition + '15';
+                        currentUI['diffEditor.removedLineBackground'] = gitDeletion + '15'; 
+                    }
                     await config.update('workbench.colorCustomizations', currentUI, vscode.ConfigurationTarget.Workspace);
                 }
             }
-            else if (data.type === 'updateToken') {
+           else if (data.type === 'updateToken') {
                 const currentConfig: any = config.get('editor.tokenColorCustomizations') || {};
                 let textMateRules = currentConfig.textMateRules || [];
                 let semanticTokenColors = currentConfig.semanticTokenColors || {};
@@ -66,7 +88,7 @@ class ThemeViewProvider implements vscode.WebviewViewProvider {
                 
                 if (targetMapping) {
                     textMateRules = textMateRules.filter((rule: any) => {
-                        if (!rule.scope) return true; 
+                        if (!rule.scope) { return true; } 
                         const ruleArray = Array.isArray(rule.scope) ? rule.scope : [rule.scope];
                         return !ruleArray.some((s: string) => targetMapping.textMate.includes(s));
                     });
@@ -102,8 +124,8 @@ class ThemeViewProvider implements vscode.WebviewViewProvider {
                         'editorBracketHighlight.foreground6': data.color,
                         'editorBracketHighlight.unexpectedBracket.foreground': data.color,
 
-                        'editorBracketMatch.background': data.color + '33',      
-                        'editorBracketMatch.border': data.color,                  
+                        'editorIndentGuide.background': data.color + '40',
+                        'editorIndentGuide.activeBackground': data.color,                 
                         
                         'editorBracketPairGuide.background1': data.color + '40',  
                         'editorBracketPairGuide.background2': data.color + '40',
