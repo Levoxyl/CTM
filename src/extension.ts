@@ -32,32 +32,42 @@ class ThemeViewProvider implements vscode.WebviewViewProvider {
 
                 if (targetFrame) {
                     targetFrame.workbenchKeys.forEach((key) => {
-                    if (key.endsWith('Slider.background')) {
-                        currentUI[key] = data.color + '40'; 
-                    } else if (key.endsWith('Slider.hoverBackground')) {
-                        currentUI[key] = data.color + '66'; 
-                    } else if (key.endsWith('Slider.activeBackground')) {
-                        currentUI[key] = data.color + '80'; 
-                    } else if (key === 'editorLineNumber.foreground') {
-                        currentUI[key] = data.color + '55'; 
-                    } else if (key === 'editorLineNumber.activeForeground') {
-                        currentUI[key] = data.color;        
-                    } else if (key === 'activityBar.inactiveForeground') {
-                        currentUI[key] = data.color + '99';
-                    } 
-                    // 🟢 ADD THIS CONDITION BELOW TO AUTOMATICALLY FADE DISABLED BUTTONS/TEXT
-                    else if (key.toLowerCase().includes('disabled') || key.endsWith('placeholderForeground')) {
-                        currentUI[key] = data.color + '66'; // Appends ~40% opacity to preserve look & feel
-                    } 
-                    else {
-                        currentUI[key] = data.color;
-                    }
-                });
-                    // if (data.scope === 'editorBackground' || data.scope === 'uiInteractiveStates') { 
-                    const referenceBg = currentUI['editor.background'] || data.color;
+                        if (key.endsWith('Slider.background')) {
+                            currentUI[key] = data.color + '40'; 
+                        } else if (key.endsWith('Slider.hoverBackground')) {
+                            currentUI[key] = data.color + '66'; 
+                        } else if (key.endsWith('Slider.activeBackground')) {
+                            currentUI[key] = data.color + '80'; 
+                        } else if (key === 'editorLineNumber.foreground') {
+                            currentUI[key] = data.color + '55'; 
+                        } else if (key === 'editorLineNumber.activeForeground') {
+                            currentUI[key] = data.color;        
+                        } else if (key === 'activityBar.inactiveForeground') {
+                            currentUI[key] = data.color + '99';
+                        } 
+                        else if (key.toLowerCase().includes('disabled') || key.endsWith('placeholderForeground')) {
+                            currentUI[key] = data.color + '66';
+                        } 
+                        else {
+                            currentUI[key] = data.color;
+                        }
+                    });
+                    
+                    const referenceBg = currentUI['editor.background'];
                     if (referenceBg) { 
-                        const isDarkBg = getLuminance(referenceBg) < 0.5;
-                        const inheritedForeground = currentUI['foreground'] || (isDarkBg ? '#ffffff' : '#111111');
+                        const inheritedForeground = currentUI['foreground'] || 'var(--vscode-foreground)';
+                        const borderToken = currentUI['panel.border'] || currentUI['sideBar.border'] || 'var(--vscode-panel-border)';
+
+                        currentUI['descriptionForeground'] = currentUI['descriptionForeground'] || 'var(--vscode-descriptionForeground)';
+                        
+                        currentUI['debugToolBar.background'] = currentUI['sideBar.background'] || referenceBg;
+                        currentUI['debugToolBar.border'] = borderToken;
+                        currentUI['debugWidget.border'] = borderToken;
+                        currentUI['debugWidget.background'] = currentUI['sideBar.background'] || referenceBg;
+                        
+                        currentUI['debugConsole.infoForeground'] = inheritedForeground;
+                        currentUI['debugConsole.warningForeground'] = currentUI['editorMarkerNavigationWarning.background'] || 'var(--vscode-editorMarkerNavigationWarning-background)';
+                        currentUI['debugConsoleInputIcon.foreground'] = data.color;
                         
                         currentUI['tooltip.background'] = referenceBg;
                         currentUI['editorHoverWidget.background'] = referenceBg;
@@ -65,26 +75,11 @@ class ThemeViewProvider implements vscode.WebviewViewProvider {
                         currentUI['editorWidget.background'] = referenceBg;
                         currentUI['tooltip.foreground'] = inheritedForeground;
                         currentUI['editorHoverWidget.foreground'] = inheritedForeground;
-
-                        const gitAddition = getAdaptiveGitColor(referenceBg, 'addition');
-                        const gitDeletion = getAdaptiveGitColor(referenceBg, 'deletion');
-                        const gitModified = isDarkBg ? '#e9c46a' : '#b58900';
-                        currentUI['gitDecoration.addedResourceForeground'] = gitAddition;
-                        currentUI['gitDecoration.deletedResourceForeground'] = gitDeletion;
-                        currentUI['gitDecoration.modifiedResourceForeground'] = gitModified;
-                        
-                        currentUI['editorGutter.addedBackground'] = gitAddition;
-                        currentUI['editorGutter.deletedBackground'] = gitDeletion;
-                        currentUI['editorGutter.modifiedBackground'] = gitModified;
-                        currentUI['diffEditor.insertedTextBackground'] = gitAddition + '33';
-                        currentUI['diffEditor.removedTextBackground'] = gitDeletion + '33';
-                        currentUI['diffEditor.insertedLineBackground'] = gitAddition + '15';
-                        currentUI['diffEditor.removedLineBackground'] = gitDeletion + '15'; 
                     }
                     await config.update('workbench.colorCustomizations', currentUI, vscode.ConfigurationTarget.Workspace);
                 }
             }
-           else if (data.type === 'updateToken') {
+            else if (data.type === 'updateToken') {
                 const currentConfig: any = config.get('editor.tokenColorCustomizations') || {};
                 let textMateRules = currentConfig.textMateRules || [];
                 let semanticTokenColors = currentConfig.semanticTokenColors || {};
@@ -110,7 +105,6 @@ class ThemeViewProvider implements vscode.WebviewViewProvider {
                         semanticTokenColors[semanticType] = data.color;
                     });
                 }
-
                 await config.update('editor.tokenColorCustomizations', { 
                     ...currentConfig, 
                     "textMateRules": textMateRules,
@@ -130,7 +124,7 @@ class ThemeViewProvider implements vscode.WebviewViewProvider {
                         'editorBracketHighlight.unexpectedBracket.foreground': data.color,
 
                         'editorIndentGuide.background': data.color + '40',
-                        'editorIndentGuide.activeBackground': data.color,                 
+                        'editorIndentGuide.activeBackground': data.color,                    
                         
                         'editorBracketPairGuide.background1': data.color + '40',  
                         'editorBracketPairGuide.background2': data.color + '40',
@@ -148,26 +142,48 @@ class ThemeViewProvider implements vscode.WebviewViewProvider {
                     }, vscode.ConfigurationTarget.Workspace);
                 }
             }
-            else if (data.type === 'saveSlot') {
-                const currentUI = config.get('workbench.colorCustomizations');
-                const currentTokens = config.get('editor.tokenColorCustomizations');
-                
-                await this._context.globalState.update(`slot_${data.slotId}`, { 
-                    ui: currentUI, 
-                    tokens: currentTokens,
-                    uiState: data.uiState 
+            else if (data.type === 'requestSlotName') {
+                const slotName = await vscode.window.showInputBox({
+                    prompt: 'Enter a name for this custom theme preset:',
+                    placeHolder: 'e.g., Cyberpunk Crimson, Muted Mint...'
                 });
-                vscode.window.showInformationMessage(`Theme saved to Slot ${data.slotId}!`);
+
+                if (slotName && slotName.trim() !== '') {
+                    const slotId = 'slot_' + Date.now();
+                    const currentUI = config.get('workbench.colorCustomizations');
+                    const currentTokens = config.get('editor.tokenColorCustomizations');
+                    
+                    await this._context.globalState.update(slotId, { 
+                        ui: currentUI, 
+                        tokens: currentTokens,
+                        uiState: data.uiState 
+                    });
+
+                    let activeLibrary: any = this._context.globalState.get('theme_library_slots') || [];
+                    activeLibrary.push({ id: slotId, name: slotName.trim() });
+                    await this._context.globalState.update('theme_library_slots', activeLibrary);
+
+                    const targetState = { ...data.uiState, savedSlots: activeLibrary };
+                    webviewView.webview.postMessage({ type: 'hydrate', uiState: targetState });
+                    vscode.window.showInformationMessage(`Theme "${slotName}" captured successfully!`);
+                }
             }
             else if (data.type === 'loadSlot') {
-                const saved: any = this._context.globalState.get(`slot_${data.slotId}`);
+                const saved: any = this._context.globalState.get(data.slotId);
                 if (saved) {
                     await config.update('workbench.colorCustomizations', saved.ui, vscode.ConfigurationTarget.Workspace);
                     await config.update('editor.tokenColorCustomizations', saved.tokens, vscode.ConfigurationTarget.Workspace);
                     
-                    webviewView.webview.postMessage({ type: 'hydrate', uiState: saved.uiState });
-                    vscode.window.showInformationMessage(`Slot ${data.slotId} loaded!`);
+                    let activeLibrary = this._context.globalState.get('theme_library_slots') || [];
+                    const combinedState = { ...saved.uiState, savedSlots: activeLibrary };
+                    
+                    webviewView.webview.postMessage({ type: 'hydrate', uiState: combinedState });
+                    vscode.window.showInformationMessage(`Loaded preset configuration!`);
                 }
+            }
+            else if (data.type === 'deleteSlot') {
+                await this._context.globalState.update(data.slotId, undefined);
+                await this._context.globalState.update('theme_library_slots', data.savedSlots);
             }
             else if (data.type === 'reset') {
                 await config.update('workbench.colorCustomizations', undefined, vscode.ConfigurationTarget.Workspace);
@@ -175,8 +191,10 @@ class ThemeViewProvider implements vscode.WebviewViewProvider {
                 await config.update('workbench.colorCustomizations', undefined, vscode.ConfigurationTarget.Global);
                 await config.update('editor.tokenColorCustomizations', undefined, vscode.ConfigurationTarget.Global);
                 
-                webviewView.webview.postMessage({ type: 'hydrate', uiState: {} });
-                vscode.window.showInformationMessage("All colors and global leftovers cleared!");
+                let activeLibrary = this._context.globalState.get('theme_library_slots') || [];
+                
+                webviewView.webview.postMessage({ type: 'hydrate', uiState: { savedSlots: activeLibrary } });
+                vscode.window.showInformationMessage("Workspace live colors reset! Your saved theme library remains intact.");
             }
         });
     }
@@ -187,18 +205,123 @@ class ThemeViewProvider implements vscode.WebviewViewProvider {
         <html>
         <head>
             <style>
-                body { font-family: sans-serif; padding: 10px; color: var(--vscode-foreground); }
-                h3 { margin-top: 12px; margin-bottom: 8px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; }
+                body {
+                    font-family: var(--vscode-font-family, sans-serif);
+                    font-weight: var(--vscode-font-weight, normal);
+                    font-size: var(--vscode-font-size, 13px);
+                    padding: 10px;
+                    color: var(--vscode-foreground); 
+                }
+                h3 { 
+                    margin-top: 12px;
+                    margin-bottom: 8px;
+                    font-size: 11px;
+                    text-transform: uppercase;
+                    letter-spacing: 0.5px;
+                }
                 .control-group { display: flex; align-items: center; margin-bottom: 8px; }
                 input[type="color"] { background: none; border: none; width: 24px; height: 24px; cursor: pointer; padding: 0; }
                 label { margin-left: 8px; font-size: 12px; }
-                button { background: var(--vscode-button-background); color: var(--vscode-button-foreground); border: none; padding: 6px; cursor: pointer; width: 100%; font-size: 12px; }
-                button:hover { background: var(--vscode-button-hoverBackground); }
+
+                .action-button { 
+                    background: var(--vscode-button-background); 
+                    color: var(--vscode-button-foreground); 
+                    border: 1px solid var(--vscode-button-border, transparent); 
+                    padding: 6px; 
+                    cursor: pointer; 
+                    width: 100%; 
+                    font-size: 12px; 
+                    border-radius: 2px;
+                    transition: background 0.15s ease, border-color 0.15s ease;
+                    display: block;
+                    text-align: center;
+                }
+                .action-button:hover { 
+                    background: var(--vscode-button-hoverBackground); 
+                }
+                
+                .btn-reset-live {
+                    background: var(--vscode-button-secondaryBackground);
+                    color: var(--vscode-button-secondaryForeground);
+                }
+                .btn-reset-live:hover {
+                    background: var(--vscode-button-secondaryHoverBackground);
+                }
+
                 hr { border: none; border-top: 1px solid var(--vscode-panel-border); margin: 15px 0; }
+                
+                .slots-header { display: flex; align-items: center; justify-content: space-between; margin-top: 15px; margin-bottom: 8px; }
+                
+                .btn-add-slot { 
+                    background: var(--vscode-button-background); 
+                    color: var(--vscode-button-foreground); 
+                    border: none; 
+                    padding: 5px 10px; 
+                    cursor: pointer; 
+                    font-size: 11px; 
+                    font-weight: bold; 
+                    border-radius: 2px; 
+                    width: auto;
+                    display: inline-block;
+                }
+                .btn-add-slot:hover { background: var(--vscode-button-hoverBackground); }
+                .slots-list { display: flex; flex-direction: column; gap: 6px; max-height: 200px; overflow-y: auto; padding-right: 2px; }
+                
+                .slot-item { 
+                    display: flex; 
+                    align-items: center; 
+                    justify-content: space-between; 
+                    background: var(--vscode-sideBar-background); 
+                    border: 1px solid var(--vscode-panel-border); 
+                    border-radius: 4px; 
+                    position: relative; 
+                    z-index: 1;
+                    overflow: hidden;
+                    transition: background 0.2s ease, transform 0.15s ease, border-color 0.15s ease; 
+                }
+                .slot-item:hover { 
+                    background: var(--vscode-list-hoverBackground) !important;
+                    border-color: var(--vscode-focusBorder);
+                    transform: translateY(-1px);
+                }
+                
+                .slot-name { 
+                    flex-grow: 1; 
+                    padding: 8px 36px 8px 10px; 
+                    font-size: 12px; 
+                    text-align: left; 
+                    overflow: hidden; 
+                    text-overflow: ellipsis; 
+                    white-space: nowrap; 
+                    font-weight: 500; 
+                    cursor: pointer; 
+                    color: var(--vscode-foreground);
+                }
+                .slot-name:hover { color: var(--vscode-textLink-activeForeground); }
+                
+                .btn-delete-slot { 
+                    background: transparent; 
+                    border: none; 
+                    position: absolute; 
+                    right: 6px; 
+                    top: 50%; 
+                    transform: translateY(-50%); 
+                    cursor: pointer; 
+                    color: var(--vscode-errorForeground); 
+                    display: flex; 
+                    align-items: center; 
+                    justify-content: center; 
+                    opacity: 0.5; 
+                    padding: 4px; 
+                    border-radius: 2px; 
+                    width: 24px; 
+                    height: 24px; 
+                }
+                .btn-delete-slot:hover { opacity: 1; background: var(--vscode-list-hoverBackground); }
             </style>
         </head>
         <body>
-            <h3 style="color: #64b5f6;">1a. Layout Frame Backgrounds</h3>
+            <h3 style="color: var(--vscode-textLink-foreground);">1a. Layout Frame Backgrounds</h3>
             <div class="control-group">
                 <input type="color" data-scope="activityBar" oninput="send('updateFrame', 'activityBar', this.value)">
                 <label>Left Panel L Background</label>
@@ -220,7 +343,7 @@ class ThemeViewProvider implements vscode.WebviewViewProvider {
                 <label>Code Canvas Background</label>
             </div>
 
-            <h3 style="color: #81c784;">1b. Core Interface Typography & Icons</h3>
+            <h3 style="color: var(--vscode-gitDecoration-addedResourceForeground);">1b. Core Interface Typography & Icons</h3>
             <div class="control-group">
                 <input type="color" data-scope="uiGeneralText" oninput="send('updateFrame', 'uiGeneralText', this.value)">
                 <label>UI Text, Menus & Gutter Lines</label>
@@ -240,7 +363,7 @@ class ThemeViewProvider implements vscode.WebviewViewProvider {
 
             <hr>
 
-            <h3 style="color: #ffd54f;">2. Text Token Colorizer</h3>
+            <h3>2. Text Token Colorizer</h3>
             <div class="control-group">
                 <input type="color" data-scope="keywords" oninput="send('updateToken', 'keywords', this.value)">
                 <label>Keywords & Storage</label>
@@ -269,53 +392,109 @@ class ThemeViewProvider implements vscode.WebviewViewProvider {
             <hr>
 
             <div style="margin-bottom: 15px;">
-                <button onclick="send('reset')" style="background: #555;">Reset Theme</button>
+                <button class="action-button btn-reset-live" onclick="send('reset')">Reset Live Colors</button>
             </div>
 
-            <h3>Presets (Slots)</h3>
-            <div style="display: flex; gap: 5px;">
-                <button onclick="send('saveSlot', '1')" style="background: #d32f2f; font-weight: bold;">Save 1</button>
-                <button onclick="send('loadSlot', '1')" style="background: #388e3c; font-weight: bold;">Load 1</button>
+            <hr>
+            <div class="slots-header">
+                <h3>Theme Library Presets</h3>
+                <button class="btn-add-slot" onclick="promptSaveSlot()">+ Save Current</button>
             </div>
+            <div id="slotsContainer" class="slots-list"></div>
 
             <script>
                 const vscode = acquireVsCodeApi();
                 let state = vscode.getState() || {};
+                let savedSlots = state.savedSlots || [];
 
                 document.querySelectorAll('input[type="color"]').forEach((el) => {
                     const scope = el.dataset.scope;
-                    if (scope && state[scope]) {
-                        el.value = state[scope];
-                    }
+                    if (scope && state[scope]) { el.value = state[scope]; }
                 });
+                renderSlots();
 
                 function send(type, keyOrScope, color) {
-                    if (type === 'saveSlot' || type === 'loadSlot') {
-                        vscode.postMessage({ type, slotId: keyOrScope, uiState: state });
-                        return;
-                    }
-                    
                     if (type === 'reset') {
-                        state = {};
+                        const originalSlots = state.savedSlots || [];
+                        state = { savedSlots: originalSlots };
                         vscode.setState(state);
                         document.querySelectorAll('input[type="color"]').forEach(el => el.value = '#000000');
+                        renderSlots();
                     } else if (color) {
                         state[keyOrScope] = color;
                         vscode.setState(state);
                     }
+                    vscode.postMessage({ type, scope: keyOrScope, key: keyOrScope, color });
+                }
 
-                    vscode.postMessage({ type, scope: keyOrScope, key: keyOrScope, color, slotId: '1' });
+                function promptSaveSlot() {
+                    vscode.postMessage({ type: 'requestSlotName', uiState: state });
+                }
+
+                function renderSlots() {
+                    const container = document.getElementById('slotsContainer');
+                    if (!container) { return; }
+                    
+                    container.innerHTML = '';
+                    
+                    if (!savedSlots || savedSlots.length === 0) {
+                        const fallback = document.createElement('div');
+                        fallback.style.fontSize = '11px';
+                        fallback.style.color = 'var(--vscode-descriptionForeground)';
+                        fallback.style.padding = '5px';
+                        fallback.style.fontStyle = 'italic';
+                        fallback.textContent = 'No configurations saved yet.';
+                        container.appendChild(fallback);
+                        return;
+                    }
+
+                    savedSlots.forEach(slot => {
+                        const item = document.createElement('div');
+                        item.className = 'slot-item';
+
+                        const nameEl = document.createElement('div');
+                        nameEl.className = 'slot-name';
+                        nameEl.title = 'Click to load setup';
+                        nameEl.textContent = slot.name;
+                        
+                        nameEl.addEventListener('click', () => {
+                            vscode.postMessage({ type: 'loadSlot', slotId: slot.id });
+                        });
+
+                        const deleteBtn = document.createElement('button');
+                        deleteBtn.className = 'btn-delete-slot';
+                        deleteBtn.title = 'Delete Preset';                     
+                        deleteBtn.innerHTML = '<svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path d="M5.5 1v1H1v1h14V2h-4.5V1h-5zM2 4v10.5a1.5 1.5 0 001.5 1.5h9a1.5 1.5 0 001.5-1.5V4H2zm3 10.5H4V6h1v8.5zm3 0H7V6h1v8.5zm3 0h-1V6h1v8.5z"/></svg>';
+                        
+                        deleteBtn.addEventListener('click', (e) => {
+                            e.stopPropagation(); 
+                            
+                            savedSlots = savedSlots.filter(s => s.id !== slot.id);
+                            state.savedSlots = savedSlots;
+                            vscode.setState(state);
+                            
+                            renderSlots();
+                            vscode.postMessage({ type: 'deleteSlot', slotId: slot.id, savedSlots });
+                        });
+                        
+                        item.appendChild(nameEl);
+                        item.appendChild(deleteBtn);
+                        container.appendChild(item);
+                    });
                 }
 
                 window.addEventListener('message', event => {
                     const message = event.data;
                     if (message.type === 'hydrate') {
                         state = message.uiState || {};
+                        savedSlots = state.savedSlots || [];
                         vscode.setState(state);
+                        
                         document.querySelectorAll('input[type="color"]').forEach(el => {
                             const scope = el.dataset.scope;
                             el.value = state[scope] || '#000000';
                         });
+                        renderSlots();
                     }
                 });
             </script>
