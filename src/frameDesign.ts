@@ -48,9 +48,18 @@ export const FRAME_MAP: Record<string, UIZoneMapping> = {
             'tab.inactiveBackground',
             'tab.unfocusedActiveBackground',
             'tab.unfocusedInactiveBackground',
-            'editorGutter.background',
+            'tab.gutter.background',
             'editorStickyScroll.background',       
-            'editorStickyScrollHover.background'   
+            'editorStickyScrollHover.background',
+            'diffEditor.headerBackground',
+            'multiDiffEditor.headerBackground',          // FIX: Handles multi-file differences top headers
+            'diffEditorStickyScroll.background',
+            'merge.headerBackground',
+            'editorGutter.background',                   // FIX: Prevents gutter track from staying black
+            
+            // BACKDROP SURFACES FOR THE SCROLL BAR TRACK & MINIMAP
+            'minimap.background',                        // Entire minimap structural strip background
+            'editorOverviewRuler.background'             // Core right hand vertical scroll runway strip
         ]
     },
     'uiGeneralText': {
@@ -91,16 +100,23 @@ export const FRAME_MAP: Record<string, UIZoneMapping> = {
             'menu.disabledForeground',              
             'list.disabledForeground',              
             'menu.shortcutForeground',              
-            'list.secondaryForeground',             
             'input.placeholderForeground',          
             'breadcrumb.foreground',                
             'breadcrumb.focusForeground',            
             'breadcrumb.activeSelectionForeground',
             'list.deemphasizedItems.foreground',    
+            'tooltip.foreground',
+            'list.secondaryForeground',
+            'keybindingLabel.foreground',
+            'editorLineNumber.foreground',
+            'editorLineNumber.activeForeground',
             'gitDecoration.ignoredResourceForeground', 
             'gitDecoration.submoduleResourceForeground',
-            'editorLineNumber.foreground',
-            'editorLineNumber.activeForeground'
+            'gitDecoration.addedResourceForeground',       
+            'gitDecoration.modifiedResourceForeground',    
+            'gitDecoration.untrackedResourceForeground',   
+            'gitDecoration.deletedResourceForeground',     
+            'gitDecoration.conflictingResourceForeground'  
         ]
     },
     'uiIconsAndVectors': {
@@ -113,7 +129,21 @@ export const FRAME_MAP: Record<string, UIZoneMapping> = {
             'tree.indentGuidesStroke',
             'statusBar.foreground',
             'statusBar.debuggingForeground',
-            'activityBar.activeBorder'
+            'activityBar.activeBorder',
+            
+            // FIX: Modern VS Code multi-level indent guide tracks
+            'editorIndentGuide.background1',
+            'editorIndentGuide.background2',
+            'editorIndentGuide.background3',
+            'editorIndentGuide.background4',
+            'editorIndentGuide.background5',
+            'editorIndentGuide.background6',
+            'editorIndentGuide.activeBackground1',
+            'editorIndentGuide.activeBackground2',
+            'editorIndentGuide.activeBackground3',
+            'editorIndentGuide.activeBackground4',
+            'editorIndentGuide.activeBackground5',
+            'editorIndentGuide.activeBackground6'
         ]
     },
     'uiLayoutBorders': {
@@ -131,16 +161,16 @@ export const FRAME_MAP: Record<string, UIZoneMapping> = {
             'editorGroupHeader.tabsBorder',
             'editorGroupHeader.border',
             'editorStickyScroll.border',
-            'tab.border',                                           
+            'tab.border',                                                                                                                                                                                                            
             'tab.inactiveBorder',
             'statusBar.border',
             'statusBar.debuggingBorder',
             'statusBar.noFolderBorder',
-            'sash.hoverBorder',                                     
+            'sash.hoverBorder',                                                                                                                                                                                                     
             'window.activeBorder',
             'menu.border',
             'widget.border',
-            'input.border',                                         
+            'inputOption.activeBorder',                                                                                                                                                                                                         
             'panelInput.border',
             'dropdown.border',
             'selectBox.border',
@@ -148,8 +178,30 @@ export const FRAME_MAP: Record<string, UIZoneMapping> = {
             'pickerGroup.border',
             'settings.dropdownBorder',
             'settings.checkboxBorder',
-            'settings.textInputBorder',
-            'focusBorder'                                           
+            'diffEditor.border',
+            'tooltip.border',
+            'focusBorder',
+            'sideBySideEditor.verticalBorder',
+            'sideBySideEditor.horizontalBorder',
+            'editorGroup.border',
+            'quickInput.border',
+            'editorWidget.border',
+            'keybindingLabel.border',
+            'keybindingLabel.bottomBorder',
+            
+            'commandCenter.border',             
+            'input.border',                     
+            'search.searchWidget.border',       
+            'searchEditor.textInputBorder',     
+            'settings.textInputBorder',         
+            
+            'scrollbarSlider.background',         
+            'scrollbarSlider.hoverBackground',    
+            'scrollbarSlider.activeBackground',   
+            'minimapSlider.background',           
+            'minimapSlider.hoverBackground',      
+            'minimapSlider.activeBackground',     
+            'editorOverviewRuler.border'          
         ]
     },
     'uiInteractiveStates': {
@@ -180,6 +232,7 @@ export const FRAME_MAP: Record<string, UIZoneMapping> = {
             'menubar.selectionBackground',
             'menu.background',
             'menu.selectionBackground',
+            'menu.selectionBorder',
             'menu.separatorBackground',
             'editorSuggestWidget.background',
             'editorSuggestWidget.border',
@@ -198,7 +251,13 @@ export const FRAME_MAP: Record<string, UIZoneMapping> = {
             'settings.modifiedItemIndicator',
             'settings.dropdownBackground',
             'settings.checkboxBackground',
-            'settings.textInputBackground'
+            'settings.textInputBackground',
+            'tooltip.background',
+            'keybindingLabel.background',
+            
+            // FIX: Linked bracket frame indicators mapped here
+            'editorBracketMatch.background',
+            'editorBracketMatch.border'
         ]
     }
 };
