@@ -9,7 +9,7 @@ export function getHtmlForWebview(): string {
                 font-weight: var(--vscode-font-weight, normal);
                 font-size: var(--vscode-font-size, 13px);
                 padding: 10px;
-                color: var(--vscode-foreground); 
+                color: var(--vscode-foreground, #cccccc); 
             }
             h3 { 
                 margin-top: 12px;
@@ -23,13 +23,13 @@ export function getHtmlForWebview(): string {
                 align-items: center; 
                 margin-bottom: 8px; 
                 gap: 6px;
-                background: var(--vscode-sideBar-background);
+                background: var(--vscode-sideBar-background, #252526);
                 padding: 4px;
                 border-radius: 4px;
                 border: 1px solid transparent;
             }
             .control-group:focus-within {
-                border-color: var(--vscode-focusBorder);
+                border-color: var(--vscode-focusBorder, #007acc);
             }
             input[type="color"] { background: none; border: none; width: 26px; height: 26px; cursor: pointer; padding: 0; }
             label { flex-grow: 1; font-size: 11px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -47,6 +47,11 @@ export function getHtmlForWebview(): string {
                 border-radius: 2px;
             }
 
+            .hex-text-input::placeholder {
+                color: var(--vscode-input-placeholderForeground, #888888);
+                opacity: 0.8;
+            }
+
             .confirm-btn, .cancel-btn {
                 border: none;
                 border-radius: 2px;
@@ -57,7 +62,7 @@ export function getHtmlForWebview(): string {
                 display: none; /* Only show when modified */
                 align-items: center;
                 justify-content: center;
-                color: #ffffff;
+                color: #ffffff !important;
                 font-weight: bold;
                 padding: 0;
             }
@@ -67,8 +72,8 @@ export function getHtmlForWebview(): string {
             .cancel-btn:hover { background: #e04a4a; }
 
             .action-button { 
-                background: var(--vscode-button-background); 
-                color: var(--vscode-button-foreground); 
+                background: var(--vscode-button-background, #007acc); 
+                color: var(--vscode-button-foreground, #ffffff) !important; 
                 border: 1px solid var(--vscode-button-border, transparent); 
                 padding: 6px; 
                 cursor: pointer; 
@@ -78,26 +83,27 @@ export function getHtmlForWebview(): string {
                 transition: background 0.15s ease, border-color 0.15s ease;
                 display: block;
                 text-align: center;
+                font-weight: 500;
             }
             .action-button:hover { 
-                background: var(--vscode-button-hoverBackground); 
+                background: var(--vscode-button-hoverBackground, #1188ff); 
             }
             
             .btn-reset-live {
-                background: var(--vscode-button-secondaryBackground);
-                color: var(--vscode-button-secondaryForeground);
+                background: var(--vscode-button-secondaryBackground, #3a3d41);
+                color: var(--vscode-button-secondaryForeground, #ffffff) !important;
             }
             .btn-reset-live:hover {
-                background: var(--vscode-button-secondaryHoverBackground);
+                background: var(--vscode-button-secondaryHoverBackground, #4c5054);
             }
 
-            hr { border: none; border-top: 1px solid var(--vscode-panel-border); margin: 15px 0; }
+            hr { border: none; border-top: 1px solid var(--vscode-panel-border, #444444); margin: 15px 0; }
             
             .slots-header { display: flex; align-items: center; justify-content: space-between; margin-top: 15px; margin-bottom: 8px; }
             
             .btn-add-slot { 
-                background: var(--vscode-button-background); 
-                color: var(--vscode-button-foreground); 
+                background: var(--vscode-button-background, #007acc); 
+                color: var(--vscode-button-foreground, #ffffff) !important; 
                 border: none; 
                 padding: 5px 10px; 
                 cursor: pointer; 
@@ -107,30 +113,29 @@ export function getHtmlForWebview(): string {
                 width: auto;
                 display: inline-block;
             }
-            .btn-add-slot:hover { background: var(--vscode-button-hoverBackground); }
+            .btn-add-slot:hover { background: var(--vscode-button-hoverBackground, #1188ff); }
             .slots-list { display: flex; flex-direction: column; gap: 6px; max-height: 200px; overflow-y: auto; padding-right: 2px; }
             
             .slot-item { 
                 display: flex; 
                 align-items: center; 
                 justify-content: space-between; 
-                background: var(--vscode-sideBar-background); 
-                border: 1px solid var(--vscode-panel-border); 
+                background: var(--vscode-sideBar-background, #252526); 
+                border: 1px solid var(--vscode-panel-border, #444444); 
                 border-radius: 4px; 
                 position: relative; 
-                z-index: 1;
                 overflow: hidden;
                 transition: background 0.2s ease, transform 0.15s ease, border-color 0.15s ease; 
             }
             .slot-item:hover { 
-                background: var(--vscode-list-hoverBackground) !important;
-                border-color: var(--vscode-focusBorder);
+                background: var(--vscode-list-hoverBackground, #2a2d2e) !important;
+                border-color: var(--vscode-focusBorder, #007acc);
                 transform: translateY(-1px);
             }
             
             .slot-name { 
                 flex-grow: 1; 
-                padding: 8px 36px 8px 10px; 
+                padding: 8px 10px;
                 font-size: 12px; 
                 text-align: left; 
                 overflow: hidden; 
@@ -138,9 +143,13 @@ export function getHtmlForWebview(): string {
                 white-space: nowrap; 
                 font-weight: 500; 
                 cursor: pointer; 
-                color: var(--vscode-foreground);
+                position: relative;
+                z-index: 5; 
+                color: var(--vscode-foreground, #cccccc);
             }
-            .slot-name:hover { color: var(--vscode-textLink-activeForeground); }
+            .slot-item:hover .slot-name {
+                color: var(--vscode-textLink-activeForeground, #3794ff) !important;
+            }
             
             .btn-delete-slot { 
                 background: transparent; 
@@ -150,7 +159,7 @@ export function getHtmlForWebview(): string {
                 top: 50%; 
                 transform: translateY(-50%); 
                 cursor: pointer; 
-                color: var(--vscode-errorForeground); 
+                color: var(--vscode-errorForeground, #f48771); 
                 display: flex; 
                 align-items: center; 
                 justify-content: center; 
@@ -159,8 +168,9 @@ export function getHtmlForWebview(): string {
                 border-radius: 2px; 
                 width: 24px; 
                 height: 24px; 
+                z-index: 3; /* Render on top of slot name layer */
             }
-            .btn-delete-slot:hover { opacity: 1; background: var(--vscode-list-hoverBackground); }
+            .btn-delete-slot:hover { opacity: 1; background: var(--vscode-list-hoverBackground, #2a2d2e); }
         </style>
     </head>
     <body>
@@ -295,7 +305,6 @@ export function getHtmlForWebview(): string {
             let state = vscode.getState() || {};
             let savedSlots = state.savedSlots || [];
             
-            // Tracks active configuration fallback snapshots on a per-scope basis
             let modificationSnapshots = {};
 
             document.querySelectorAll('input[type="color"]').forEach((el) => {
@@ -328,7 +337,6 @@ export function getHtmlForWebview(): string {
                 vscode.postMessage({ type, scope: keyOrScope, key: keyOrScope, color });
             }
 
-            // Runs when color picker is tweaked
             function handleNativeColorInput(scope, color) {
                 ensureSnapshot(scope, () => {
                     document.getElementById('hex-' + scope).value = color;
@@ -337,9 +345,8 @@ export function getHtmlForWebview(): string {
                 });
             }
 
-            // Runs when manual text character overrides are keyed into input box
             function handleHexTextInput(scope, value) {
-                if (!value.startsWith('#')) {
+                if (!value.startsWith('#') && value.trim().length > 0) {
                     value = '#' + value;
                     document.getElementById('hex-' + scope).value = value;
                 }
@@ -357,17 +364,14 @@ export function getHtmlForWebview(): string {
                     callback();
                     return;
                 }
-                // Save original field values to UI state
                 modificationSnapshots[scope] = {
                     uiStateColor: state[scope] || '#000000',
                     domColor: document.getElementById('cp-' + scope).value
                 };
                 toggleActionButtons(scope, true);
                 
-                // Get complete VS Code setting files snapshot for deep recovery on cancellation
                 vscode.postMessage({ type: 'snapshotCurrentColors', scope: scope });
                 
-                // Block executing dynamic color adjustments until listener acknowledges receipt
                 const tempHandler = (event) => {
                     if (event.data.type === 'colorSnapshotResponse' && event.data.scope === scope) {
                         modificationSnapshots[scope].workbenchSnapshot = {
@@ -386,24 +390,20 @@ export function getHtmlForWebview(): string {
                 document.getElementById('cc-' + scope).style.display = show ? 'inline-flex' : 'none';
             }
 
-            // User clicks green tick box: lock it in and hide action buttons
             function commitChange(scope) {
                 delete modificationSnapshots[scope];
                 toggleActionButtons(scope, false);
             }
 
-            // User clicks red cross box: roll configurations back
             function cancelChange(scope) {
                 const snap = modificationSnapshots[scope];
                 if (!snap) return;
 
-                // Revert interface nodes
                 state[scope] = snap.uiStateColor;
                 vscode.setState(state);
                 document.getElementById('cp-' + scope).value = snap.domColor;
                 document.getElementById('hex-' + scope).value = snap.domColor;
 
-                // Revert workspace extension states
                 if (snap.workbenchSnapshot) {
                     vscode.postMessage({ type: 'revertColors', snapshot: snap.workbenchSnapshot });
                 }
@@ -464,7 +464,7 @@ export function getHtmlForWebview(): string {
                     item.appendChild(nameEl);
                     item.appendChild(deleteBtn);
                     container.appendChild(item);
-                });
+                }); 
             }
 
             window.addEventListener('message', event => {
@@ -474,11 +474,21 @@ export function getHtmlForWebview(): string {
                     savedSlots = state.savedSlots || [];
                     vscode.setState(state);
                     
-                    document.querySelectorAll('input[type="color"]').forEach(el => {
+                    document.querySelectorAll('input[type="color"]').forEach((el) => {
                         const scope = el.dataset.scope;
-                        const val = state[scope] || '#000000';
-                        el.value = val;
-                        document.getElementById('hex-' + scope).value = val;
+
+                        if (scope && state[scope]) {
+                            el.value = state[scope];
+                            const txtInput = document.getElementById('hex-' + scope);
+                            if (txtInput) { txtInput.value = state[scope]; }
+                        } else {
+                            // FIX: Clear value completely to empty string so placeholder is visible!
+                            const txtInput = document.getElementById('hex-' + scope);
+                            if (txtInput) { 
+                                txtInput.value = ''; 
+                                txtInput.placeholder = '#------';
+                            }
+                        }
                     });
                     renderSlots();
                 }
