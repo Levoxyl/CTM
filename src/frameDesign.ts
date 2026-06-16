@@ -152,7 +152,8 @@ export const FRAME_MAP: Record<string, UIZoneMapping> = {
             'debugView.stateLabelForeground',
             'debugConsole.warningForeground',
             'debugConsole.errorForeground',
-            
+            'button.secondaryForeground',
+            'editorInlineSuggest.foreground'
             
         ]
     },
@@ -223,6 +224,9 @@ export const FRAME_MAP: Record<string, UIZoneMapping> = {
             'editorIndentGuide.activeBackground3',
             
             'debugToolBar.border',
+            'button.border',
+            'button.secondaryBorder',
+            'button.separatorBorder',
         ]
     },
     'uiInteractiveStates': {
