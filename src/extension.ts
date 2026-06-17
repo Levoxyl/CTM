@@ -238,11 +238,19 @@ class ThemeViewProvider implements vscode.WebviewViewProvider {
                     } catch (e) {
                         // Workspace target unavailable; ignore and proceed to clean Global settings
                     }
+
                 await config.update('workbench.colorCustomizations', undefined, vscode.ConfigurationTarget.Global);
                 await config.update('editor.tokenColorCustomizations', undefined, vscode.ConfigurationTarget.Global);
                 
                 let activeLibrary = this._context.globalState.get('theme_library_slots') || [];
-                webviewView.webview.postMessage({ type: 'hydrate', uiState: { savedSlots: activeLibrary } });
+
+                webviewView.webview.postMessage({
+                        type: 'hydrate',
+                        uiState: {
+                                savedSlots: activeLibrary,
+                                isHardReset: true
+                            } 
+                    });
                 vscode.window.showInformationMessage("Workspace live colors reset! Your saved theme library remains intact.");
             }
         });

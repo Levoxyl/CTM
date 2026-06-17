@@ -469,7 +469,19 @@ export function getHtmlForWebview(): string {
 
             window.addEventListener('message', event => {
                 const message = event.data;
+
                 if (message.type === 'hydrate') {
+                    const { uiState } = message;
+
+                    if (uiState.isHardReset){
+                        const input = document.querySelectorAll('input[type="text"]');
+                        input.forEach(input =>{
+                            input.value = '#000000';
+                            const colorPicker = input.previousElementSibling;
+                            if(colorPicker) colorPicker.style.background = '#000000';
+                        });
+                    }
+
                     state = message.uiState || {};
                     savedSlots = state.savedSlots || [];
                     vscode.setState(state);
