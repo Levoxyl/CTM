@@ -135,7 +135,7 @@ export function getHtmlForWebview(): string {
             
             .slot-name { 
                 flex-grow: 1; 
-                padding: 8px 10px;
+                padding: 8px 32px 8px 10px;
                 font-size: 12px; 
                 text-align: left; 
                 overflow: hidden; 
@@ -144,7 +144,7 @@ export function getHtmlForWebview(): string {
                 font-weight: 500; 
                 cursor: pointer; 
                 position: relative;
-                z-index: 5; 
+                z-index: 2; 
                 color: var(--vscode-foreground, #cccccc);
             }
             .slot-item:hover .slot-name {
@@ -159,7 +159,7 @@ export function getHtmlForWebview(): string {
                 top: 50%; 
                 transform: translateY(-50%); 
                 cursor: pointer; 
-                color: var(--vscode-errorForeground, #f48771); 
+                color: var(--vscode-errorForeground, #d5482c); 
                 display: flex; 
                 align-items: center; 
                 justify-content: center; 
@@ -168,7 +168,7 @@ export function getHtmlForWebview(): string {
                 border-radius: 2px; 
                 width: 24px; 
                 height: 24px; 
-                z-index: 3; /* Render on top of slot name layer */
+                z-index: 5;
             }
             .btn-delete-slot:hover { opacity: 1; background: var(--vscode-list-hoverBackground, #2a2d2e); }
         </style>
@@ -482,11 +482,14 @@ export function getHtmlForWebview(): string {
                             const txtInput = document.getElementById('hex-' + scope);
                             if (txtInput) { txtInput.value = state[scope]; }
                         } else {
-                            // FIX: Clear value completely to empty string so placeholder is visible!
                             const txtInput = document.getElementById('hex-' + scope);
                             if (txtInput) { 
                                 txtInput.value = ''; 
                                 txtInput.placeholder = '#------';
+                            } 
+                               
+                            if(el) {
+                                el.value = '#000000';
                             }
                         }
                     });

@@ -23,87 +23,89 @@ class ThemeViewProvider implements vscode.WebviewViewProvider {
 
         webviewView.webview.html = getHtmlForWebview();
 
-    webviewView.webview.onDidReceiveMessage(async (data) => {
-        const config = vscode.workspace.getConfiguration();
+        webviewView.webview.onDidReceiveMessage(async (data) => {
+            const config = vscode.workspace.getConfiguration();
+            //Check array length for stopping from empty window tracking
+            const targetConfig = (vscode.workspace.workspaceFolders && vscode.workspace.workspaceFolders.length > 0)
+                ? vscode.ConfigurationTarget.Workspace 
+                : vscode.ConfigurationTarget.Global;
 
-        if (data.type === 'snapshotCurrentColors') {
-            const currentUI = config.get('workbench.colorCustomizations') || {};
-            const currentTokens = config.get('editor.tokenColorCustomizations') || {};
-            webviewView.webview.postMessage({
-                type: 'colorSnapshotResponse',
-                scope: data.scope,
-                ui: currentUI,
-                tokens: currentTokens
-            });
-            return;
-        }
 
-        if (data.type === 'revertColors') {
-            await config.update('workbench.colorCustomizations', data.snapshot.ui, vscode.ConfigurationTarget.Workspace);
-            await config.update('editor.tokenColorCustomizations', data.snapshot.tokens, vscode.ConfigurationTarget.Workspace);
-            return;
-        }
-
-        if (data.type === 'updateFrame') {
-            // Deep copy object to avoid mutations and state leakage
-            const currentUI: any = JSON.parse(JSON.stringify(config.get('workbench.colorCustomizations') || {}));
-            const targetFrame = FRAME_MAP[data.scope];
-
-            if (targetFrame) {
-                targetFrame.workbenchKeys.forEach((key) => {
-                    if (key.endsWith('Slider.background')) {
-                        currentUI[key] = data.color + '40'; 
-                    } else if (key.endsWith('Slider.hoverBackground')) {
-                        currentUI[key] = data.color + '66'; 
-                    } else if (key.endsWith('Slider.activeBackground')) {
-                        currentUI[key] = data.color + '80'; 
-                    } else if (key === 'editorLineNumber.foreground') {
-                        currentUI[key] = data.color + '55'; 
-                    } else if (key === 'editorLineNumber.activeForeground') {
-                        currentUI[key] = data.color;        
-                    } else if (key === 'activityBar.inactiveForeground') {
-                        currentUI[key] = data.color + '99';
-                    } else if (key.toLowerCase().includes('disabled') || key.endsWith('placeholderForeground')) {
-                        currentUI[key] = data.color + '66';
-                    } else {
-                        // FIX: Avoid writing CSS 'var()' values to config. Use explicit colors or clear the key.
-                        if (key === 'descriptionForeground' && data.scope === 'marketplace' && data.color.toLowerCase() === '#ff0000') {
-                            delete currentUI[key]; // Deleting lets VS Code safely use internal native defaults instead of breaking
-                        } else {
-                            currentUI[key] = data.color;
-                        }
-                    }
+            if (data.type === 'snapshotCurrentColors') {
+                const currentUI = config.get('workbench.colorCustomizations') || {};
+                const currentTokens = config.get('editor.tokenColorCustomizations') || {};
+                webviewView.webview.postMessage({
+                    type: 'colorSnapshotResponse',
+                    scope: data.scope,
+                    ui: currentUI,
+                    tokens: currentTokens
                 });
-                
-                const referenceBg = currentUI['editor.background'];
-                if (referenceBg) { 
-                    const inheritedForeground = currentUI['foreground'];
-                    const borderToken = currentUI['panel.border'] || currentUI['sideBar.border'];
-
-                    // FIX: Only apply fallback defaults safely if they don't already exist to stop overriding problems
-                    if (borderToken) {
-                        currentUI['debugToolBar.border'] = currentUI['debugToolBar.border'] || borderToken;
-                        currentUI['debugWidget.border'] = currentUI['debugWidget.border'] || borderToken;
-                    }
-                    
-                    currentUI['debugToolBar.background'] = currentUI['debugToolBar.background'] || currentUI['sideBar.background'] || referenceBg;
-                    currentUI['debugWidget.background'] = currentUI['debugWidget.background'] || currentUI['sideBar.background'] || referenceBg;
-                    
-                    if (inheritedForeground) {
-                        currentUI['debugConsole.infoForeground'] = currentUI['debugConsole.infoForeground'] || inheritedForeground;
-                        currentUI['tooltip.foreground'] = currentUI['tooltip.foreground'] || inheritedForeground;
-                        currentUI['editorHoverWidget.foreground'] = currentUI['editorHoverWidget.foreground'] || inheritedForeground;
-                    }
-                    
-                    currentUI['debugConsoleInputIcon.foreground'] = currentUI['debugConsoleInputIcon.foreground'] || data.color;
-                    currentUI['tooltip.background'] = currentUI['tooltip.background'] || referenceBg;
-                    currentUI['editorHoverWidget.background'] = currentUI['editorHoverWidget.background'] || referenceBg;
-                    currentUI['editorHoverWidget.statusBarBackground'] = currentUI['editorHoverWidget.statusBarBackground'] || referenceBg;
-                    currentUI['editorWidget.background'] = currentUI['editorWidget.background'] || referenceBg;
-                }
-                await config.update('workbench.colorCustomizations', currentUI, vscode.ConfigurationTarget.Workspace);
+                return;
             }
-        }
+
+            if (data.type === 'revertColors') {
+                await config.update('workbench.colorCustomizations', data.snapshot.ui, targetConfig);
+                await config.update('editor.tokenColorCustomizations', data.snapshot.tokens, targetConfig);
+                return;
+            }
+
+            if (data.type === 'updateFrame') {
+                const currentUI: any = JSON.parse(JSON.stringify(config.get('workbench.colorCustomizations') || {}));
+                const targetFrame = FRAME_MAP[data.scope];
+
+                if (targetFrame) {
+                    targetFrame.workbenchKeys.forEach((key) => {
+                        if (key.endsWith('Slider.background')) {
+                            currentUI[key] = data.color + '40'; 
+                        } else if (key.endsWith('Slider.hoverBackground')) {
+                            currentUI[key] = data.color + '66'; 
+                        } else if (key.endsWith('Slider.activeBackground')) {
+                            currentUI[key] = data.color + '80'; 
+                        } else if (key === 'editorLineNumber.foreground') {
+                            currentUI[key] = data.color + '55'; 
+                        } else if (key === 'editorLineNumber.activeForeground') {
+                            currentUI[key] = data.color;        
+                        } else if (key === 'activityBar.inactiveForeground') {
+                            currentUI[key] = data.color + '99';
+                        } else if (key.toLowerCase().includes('disabled') || key.endsWith('placeholderForeground')) {
+                            currentUI[key] = data.color + '66';
+                        } else {
+                            if (key === 'descriptionForeground' && data.scope === 'marketplace' && data.color.toLowerCase() === '#ff0000') {
+                                delete currentUI[key]; 
+                            } else {
+                                currentUI[key] = data.color;
+                            }
+                        }
+                    });
+                    
+                    const referenceBg = currentUI['editor.background'];
+                    if (referenceBg) { 
+                        const inheritedForeground = currentUI['foreground'];
+                        const borderToken = currentUI['panel.border'] || currentUI['sideBar.border'];
+
+                        if (borderToken) {
+                            currentUI['debugToolBar.border'] = currentUI['debugToolBar.border'] || borderToken;
+                            currentUI['debugWidget.border'] = currentUI['debugWidget.border'] || borderToken;
+                        }
+                        
+                        currentUI['debugToolBar.background'] = currentUI['debugToolBar.background'] || currentUI['sideBar.background'] || referenceBg;
+                        currentUI['debugWidget.background'] = currentUI['debugWidget.background'] || currentUI['sideBar.background'] || referenceBg;
+                        
+                        if (inheritedForeground) {
+                            currentUI['debugConsole.infoForeground'] = currentUI['debugConsole.infoForeground'] || inheritedForeground;
+                            currentUI['tooltip.foreground'] = currentUI['tooltip.foreground'] || inheritedForeground;
+                            currentUI['editorHoverWidget.foreground'] = currentUI['editorHoverWidget.foreground'] || inheritedForeground;
+                        }
+                        
+                        currentUI['debugConsoleInputIcon.foreground'] = currentUI['debugConsoleInputIcon.foreground'] || data.color;
+                        currentUI['tooltip.background'] = currentUI['tooltip.background'] || referenceBg;
+                        currentUI['editorHoverWidget.background'] = currentUI['editorHoverWidget.background'] || referenceBg;
+                        currentUI['editorHoverWidget.statusBarBackground'] = currentUI['editorHoverWidget.statusBarBackground'] || referenceBg;
+                        currentUI['editorWidget.background'] = currentUI['editorWidget.background'] || referenceBg;
+                    }
+                    await config.update('workbench.colorCustomizations', currentUI, targetConfig);
+                }
+            }
             else if (data.type === 'updateToken') {
                 const currentConfig: any = config.get('editor.tokenColorCustomizations') || {};
                 let textMateRules = currentConfig.textMateRules || [];
@@ -134,7 +136,7 @@ class ThemeViewProvider implements vscode.WebviewViewProvider {
                     ...currentConfig, 
                     "textMateRules": textMateRules,
                     "semanticTokenColors": semanticTokenColors
-                }, vscode.ConfigurationTarget.Workspace);
+                }, targetConfig);
 
                 if (data.scope === 'punctuation') {
                     const currentUI: any = config.get('workbench.colorCustomizations') || {};
@@ -164,7 +166,7 @@ class ThemeViewProvider implements vscode.WebviewViewProvider {
                         'editorBracketPairGuide.activeBackground4': data.color,
                         'editorBracketPairGuide.activeBackground5': data.color,
                         'editorBracketPairGuide.activeBackground6': data.color
-                    }, vscode.ConfigurationTarget.Workspace);
+                    }, targetConfig);
                 }
             }
             else if (data.type === 'requestSlotName') {
@@ -176,11 +178,9 @@ class ThemeViewProvider implements vscode.WebviewViewProvider {
                 if (slotName && slotName.trim() !== '') {
                     const slotId = 'slot_' + Date.now();
                     
-                    // DEEP COPY
                     const currentUI = JSON.parse(JSON.stringify(config.get('workbench.colorCustomizations') || {}));
                     const currentTokens = JSON.parse(JSON.stringify(config.get('editor.tokenColorCustomizations') || {}));
                     
-                    // Save the clean copies to global state
                     await this._context.globalState.update(slotId, { 
                         ui: currentUI, 
                         tokens: currentTokens,
@@ -191,7 +191,6 @@ class ThemeViewProvider implements vscode.WebviewViewProvider {
                     activeLibrary.push({ id: slotId, name: slotName.trim() });
                     await this._context.globalState.update('theme_library_slots', activeLibrary);
 
-                    // Explicitly construct the target state instead of reading back from a pending config.get()
                     const targetState = { 
                         ...JSON.parse(JSON.stringify(data.uiState)), 
                         savedSlots: activeLibrary 
@@ -204,13 +203,16 @@ class ThemeViewProvider implements vscode.WebviewViewProvider {
             else if (data.type === 'loadSlot') {
                 const saved: any = this._context.globalState.get(data.slotId);
                 if (saved) {
-                    // updates sequentially
-                    await config.update('workbench.colorCustomizations', saved.ui, vscode.ConfigurationTarget.Workspace);
-                    await config.update('editor.tokenColorCustomizations', saved.tokens, vscode.ConfigurationTarget.Workspace);
+                    const targetUI = (saved.ui && Object.keys(saved.ui).length > 0) ? saved.ui : undefined;
+                    const targetTokens = (saved.tokens && Object.keys(saved.tokens).length > 0) ? saved.tokens : undefined;
+
+                    await config.update('workbench.colorCustomizations', targetUI, targetConfig);
+                    await config.update('editor.tokenColorCustomizations', targetTokens, targetConfig);
                     
                     let activeLibrary = this._context.globalState.get('theme_library_slots') || [];
-                    
-                    const combinedState = JSON.parse(JSON.stringify({ ...saved.uiState, savedSlots: activeLibrary }));
+
+                    const cleanUIState = saved.uiState || {};
+                    const combinedState = JSON.parse(JSON.stringify({ ...cleanUIState, savedSlots: activeLibrary }));
                     
                     webviewView.webview.postMessage({ type: 'hydrate', uiState: combinedState });
                     vscode.window.showInformationMessage(`Loaded preset configuration!`);
@@ -219,15 +221,27 @@ class ThemeViewProvider implements vscode.WebviewViewProvider {
             else if (data.type === 'deleteSlot') {
                 await this._context.globalState.update(data.slotId, undefined);
                 await this._context.globalState.update('theme_library_slots', data.savedSlots);
+
+                const targetState = {
+                    ...JSON.parse(JSON.stringify(data.uiState || {})),
+                    savedSlots: data.savedSlots
+                };
+                webviewView.webview.postMessage({ type: 'hydrate', uiState: targetState });
+                vscode.window.showInformationMessage("Theme preset deleted configuration successfully.");
             }
             else if (data.type === 'reset') {
-                await config.update('workbench.colorCustomizations', undefined, vscode.ConfigurationTarget.Workspace);
-                await config.update('editor.tokenColorCustomizations', undefined, vscode.ConfigurationTarget.Workspace);
+
+                //Safe wrap
+                try {
+                        await config.update('workbench.colorCustomizations', undefined, vscode.ConfigurationTarget.Workspace);
+                        await config.update('editor.tokenColorCustomizations', undefined, vscode.ConfigurationTarget.Workspace);
+                    } catch (e) {
+                        // Workspace target unavailable; ignore and proceed to clean Global settings
+                    }
                 await config.update('workbench.colorCustomizations', undefined, vscode.ConfigurationTarget.Global);
                 await config.update('editor.tokenColorCustomizations', undefined, vscode.ConfigurationTarget.Global);
                 
                 let activeLibrary = this._context.globalState.get('theme_library_slots') || [];
-                
                 webviewView.webview.postMessage({ type: 'hydrate', uiState: { savedSlots: activeLibrary } });
                 vscode.window.showInformationMessage("Workspace live colors reset! Your saved theme library remains intact.");
             }
