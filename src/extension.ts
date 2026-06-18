@@ -202,12 +202,15 @@ class ThemeViewProvider implements vscode.WebviewViewProvider {
             }
             else if (data.type === 'loadSlot') {
                 const saved: any = this._context.globalState.get(data.slotId);
-                if (saved) {
-                    const targetUI = (saved.ui && Object.keys(saved.ui).length > 0) ? saved.ui : undefined;
-                    const targetTokens = (saved.tokens && Object.keys(saved.tokens).length > 0) ? saved.tokens : undefined;
 
-                    await config.update('workbench.colorCustomizations', targetUI, targetConfig);
-                    await config.update('editor.tokenColorCustomizations', targetTokens, targetConfig);
+                if (saved) {
+                    //Fall back to empty instead of setting them undefined right away 
+                    const targetUI = saved.ui || {};
+                    const targetTokens = saved.tokens || {};
+
+                    // No leaks
+                    await config.update('workbench.colorCustomizations', Object.keys(targetUI).length > 0 ? targetUI : undefined ,targetConfig);
+                    await config.update('editor.tokenColorCustomizations', Object.keys(targetTokens).length > 0 ? targetTokens: undefined, targetConfig);
                     
                     let activeLibrary = this._context.globalState.get('theme_library_slots') || [];
 
@@ -219,15 +222,54 @@ class ThemeViewProvider implements vscode.WebviewViewProvider {
                 }
             }
             else if (data.type === 'deleteSlot') {
-                await this._context.globalState.update(data.slotId, undefined);
-                await this._context.globalState.update('theme_library_slots', data.savedSlots);
+                const presetToDelete: any = this._context.globalState.get(data.slotId);
 
-                const targetState = {
-                    ...JSON.parse(JSON.stringify(data.uiState || {})),
-                    savedSlots: data.savedSlots
-                };
-                webviewView.webview.postMessage({ type: 'hydrate', uiState: targetState });
-                vscode.window.showInformationMessage("Theme preset deleted configuration successfully.");
+                if(presetToDelete){
+                    const config = vscode.workspace.getConfiguration();
+                    const currentActiveUI: any = config.get('workbench.colorCustomizations') || {};
+                    const presetUI = presetToDelete.ui || {};
+
+                    let isCurrentlyActive = true;
+                    const presetKeys = Object.keys(presetUI);
+
+                    if (presetKeys.length === 0 && Object.keys(currentActiveUI).length === 0){
+                        isCurrentlyActive = true;
+                    }else{
+                        for (const key of presetKeys){
+                            if (currentActiveUI[key] !== presetUI[key]){
+                                isCurrentlyActive = false;
+                                break;
+                            } 
+                        }
+                        if (Object.keys(currentActiveUI).length !== presetKeys.length){
+                            isCurrentlyActive = false;
+                        }
+                    }
+
+                    if(isCurrentlyActive){
+                        await config.update('workbench.colorCustomizations', {}, targetConfig);
+                        await config.update('editor.tokenColorCustomizations', {}, targetConfig);
+                    }else{
+                        //Mismatch
+                    }
+                    let activeLibrary: any[] = this._context.globalState.get('theme_library_slots') || [];
+                    activeLibrary = activeLibrary.filter(slot => slot.id !== data.slotId);
+
+                    await this._context.globalState.update('theme_library_slots', activeLibrary);
+                    await this._context.globalState.update(data.slotId, undefined);
+
+                    if(isCurrentlyActive){
+                        webviewView.webview.postMessage({
+                            type:'hydrate',
+                            uiState:{savedSlots: activeLibrary, isHardReset: true}
+                        });
+                    }else{
+                        const currentUIState = this._context.globalState.get('theme_library_staet') || {};
+                        const combinedState = {...currentUIState, savedSlots: activeLibrary};
+                        webviewView.webview.postMessage({type: 'hydrate', uiState: combinedState});
+                    }
+                    vscode.window.showInformationMessage(`Removed preset from library.`);
+                }
             }
             else if (data.type === 'reset') {
 

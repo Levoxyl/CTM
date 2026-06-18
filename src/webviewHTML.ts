@@ -31,7 +31,29 @@ export function getHtmlForWebview(): string {
             .control-group:focus-within {
                 border-color: var(--vscode-focusBorder, #007acc);
             }
-            input[type="color"] { background: none; border: none; width: 26px; height: 26px; cursor: pointer; padding: 0; }
+            input[type="color"] {
+                --webkit-appearance: none;
+                background: transparent;
+                border: 1px solid var(--vscode-settings-textInputBorder, #444);
+                width: 24px;
+                height: 24px;
+                cursor: pointer;
+                padding: 0;
+                box-sizing: border-box;
+                vertical-align: middle;
+            }
+            input[type="color"]::-webkit-color-swatch-wrapper {
+                padding: 0;
+            }
+            input[type="color"]::-webkit-color-swatch {
+                border: none;
+            }
+            .theme-row.is-empty input[type="color"] {
+                opacity: 0.3; 
+                border: 1px dashed var(--vscode-panel-border, #888);
+                filter: grayscale(100%);
+            }
+
             label { flex-grow: 1; font-size: 11px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
             .hex-text-input {
@@ -171,6 +193,11 @@ export function getHtmlForWebview(): string {
                 z-index: 5;
             }
             .btn-delete-slot:hover { opacity: 1; background: var(--vscode-list-hoverBackground, #2a2d2e); }
+            .is-empty input[type="color"] {
+                opacity: 0.25; 
+                border-style: dashed;
+                filter: grayscale(100%);
+            }
         </style>
     </head>
     <body>
@@ -473,10 +500,11 @@ export function getHtmlForWebview(): string {
                 if (message.type === 'hydrate') {
                     const { uiState } = message;
 
-                    if (uiState.isHardReset){
+                    if (uiState && uiState.isHardReset){
                         const input = document.querySelectorAll('input[type="text"]');
                         input.forEach(input =>{
-                            input.value = '#000000';
+                            input.value = '';
+                            input.placeholder = '#------';
                             const colorPicker = input.previousElementSibling;
                             if(colorPicker) colorPicker.style.background = '#000000';
                         });
@@ -488,21 +516,23 @@ export function getHtmlForWebview(): string {
                     
                     document.querySelectorAll('input[type="color"]').forEach((el) => {
                         const scope = el.dataset.scope;
+                        const txtInput = document.getElementById('hex-' + scope);
+
+                        const rowWrapper = el.closest('.theme-row') || el.parentElement;
 
                         if (scope && state[scope]) {
                             el.value = state[scope];
-                            const txtInput = document.getElementById('hex-' + scope);
                             if (txtInput) { txtInput.value = state[scope]; }
+                            if(rowWrapper) rowWrapper.classList.remove('is-empty');
                         } else {
-                            const txtInput = document.getElementById('hex-' + scope);
                             if (txtInput) { 
                                 txtInput.value = ''; 
                                 txtInput.placeholder = '#------';
-                            } 
-                               
+                            }                
                             if(el) {
                                 el.value = '#000000';
                             }
+                            if(rowWrapper) rowWrapper.classList.add('is-empty');
                         }
                     });
                     renderSlots();
@@ -510,5 +540,5 @@ export function getHtmlForWebview(): string {
             });
         </script>
     </body>
-    </html>`;
+</html>`;
 }
