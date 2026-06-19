@@ -2,8 +2,9 @@
   "name": "custom-theme-maker",
   "displayName": "Custom Theme Maker(CTM)",
   "description": "Kill the rainbow with a custom live theme editor.",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "publisher": "Levoxyl",
+  "icon": "icon.png", 
   "engines": {
     "vscode": "^1.116.0"
   },
@@ -18,7 +19,7 @@
         {
           "id": "theme-maker-sidebar",
           "title": "Custom Theme Maker",
-          "icon": "rainbow-fill-svgrepo-com.svg"
+          "icon": "rainbow-fill-svgrepo-com.svg" 
         }
       ]
     },
