@@ -1,9 +1,9 @@
 {
   "name": "custom-theme-maker",
-  "displayName": "Custom Theme Maker",
+  "displayName": "Custom Theme Maker(CTM)",
   "description": "Kill the rainbow with a custom live theme editor.",
   "version": "0.0.1",
-  "publisher": "your-name",
+  "publisher": "Levoxyl",
   "engines": {
     "vscode": "^1.116.0"
   },
@@ -45,6 +45,7 @@
     "@types/node": "^22.19.21",
     "@types/vscode": "^1.116.0",
     "@vscode/test-cli": "^0.0.11",
+    "@vscode/vsce": "^3.9.2",
     "eslint": "^9.39.3",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.56.1"
