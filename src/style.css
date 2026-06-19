@@ -18,7 +18,7 @@
                 margin-bottom: 8px; 
                 gap: 6px;
                 background: var(--vscode-sideBar-background, #252526);
-                padding: 4px;
+                padding: 4px 6px;
                 border-radius: 4px;
                 border: 1px solid transparent;
             }
@@ -45,10 +45,8 @@
                 border: none;
             }
 
-            /* FIXED: Targeted your accurate control-group container wrappers */
             .control-group.is-empty input[type="color"] {
                 border: 1px dashed var(--vscode-panel-border, #666);
-                /* FIXED: Use filters instead of opacity so it does not become transparent */
                 filter: grayscale(100%) brightness(0.5);
             }
 
@@ -144,7 +142,8 @@
                 border: 1px solid var(--vscode-panel-border, #444444); 
                 border-radius: 4px; 
                 position: relative; 
-                overflow: hidden;
+                /* overflow: hidden; */
+                margin: 2px 4px;
                 transition: background 0.2s ease, transform 0.15s ease, border-color 0.15s ease; 
             }
             .slot-item:hover { 
