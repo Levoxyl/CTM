@@ -201,7 +201,7 @@ export function getHtmlForWebview(): string {
         </style>
     </head>
     <body>
-        <h3 style="color: var(--vscode-textLink-foreground);">1a. Layout Frame Backgrounds</h3>
+        <h3 style="color: var(--vscode-textLink-foreground);">1. Layout Frame Backgrounds</h3>
         <div class="control-group" id="group-activityBar">
             <input type="color" data-scope="activityBar" id="cp-activityBar" oninput="handleNativeColorInput('activityBar', this.value)">
             <input type="text" class="hex-text-input" id="hex-activityBar" maxlength="7" oninput="handleHexTextInput('activityBar', this.value)">
@@ -237,8 +237,15 @@ export function getHtmlForWebview(): string {
             <button class="confirm-btn" id="ok-editorBackground" title="Commit Color" onclick="commitChange('editorBackground')">✓</button>
             <button class="cancel-btn" id="cc-editorBackground" title="Revert Changes" onclick="cancelChange('editorBackground')">✕</button>
         </div>
+        <div class="control-group" id="group-uiInteractiveStates">
+            <input type="color" data-scope="uiInteractiveStates" id="cp-uiInteractiveStates" oninput="handleNativeColorInput('uiInteractiveStates', this.value)">
+            <input type="text" class="hex-text-input" id="hex-uiInteractiveStates" maxlength="7" oninput="handleHexTextInput('uiInteractiveStates', this.value)">
+            <label>Selections, Hovers & Menus</label>
+            <button class="confirm-btn" id="ok-uiInteractiveStates" title="Commit Color" onclick="commitChange('uiInteractiveStates')">✓</button>
+            <button class="cancel-btn" id="cc-uiInteractiveStates" title="Revert Changes" onclick="cancelChange('uiInteractiveStates')">✕</button>
+        </div>
 
-        <h3 style="color: var(--vscode-gitDecoration-addedResourceForeground);">1b. Core Interface Typography & Icons</h3>
+        <h3 style="color: var(--vscode-gitDecoration-addedResourceForeground);">2. Core Interface Typography & Icons</h3>
         <div class="control-group" id="group-uiGeneralText">
             <input type="color" data-scope="uiGeneralText" id="cp-uiGeneralText" oninput="handleNativeColorInput('uiGeneralText', this.value)">
             <input type="text" class="hex-text-input" id="hex-uiGeneralText" maxlength="7" oninput="handleHexTextInput('uiGeneralText', this.value)">
@@ -260,17 +267,10 @@ export function getHtmlForWebview(): string {
             <button class="confirm-btn" id="ok-uiLayoutBorders" title="Commit Color" onclick="commitChange('uiLayoutBorders')">✓</button>
             <button class="cancel-btn" id="cc-uiLayoutBorders" title="Revert Changes" onclick="cancelChange('uiLayoutBorders')">✕</button>
         </div>
-        <div class="control-group" id="group-uiInteractiveStates">
-            <input type="color" data-scope="uiInteractiveStates" id="cp-uiInteractiveStates" oninput="handleNativeColorInput('uiInteractiveStates', this.value)">
-            <input type="text" class="hex-text-input" id="hex-uiInteractiveStates" maxlength="7" oninput="handleHexTextInput('uiInteractiveStates', this.value)">
-            <label>Selections, Hovers & Menus</label>
-            <button class="confirm-btn" id="ok-uiInteractiveStates" title="Commit Color" onclick="commitChange('uiInteractiveStates')">✓</button>
-            <button class="cancel-btn" id="cc-uiInteractiveStates" title="Revert Changes" onclick="cancelChange('uiInteractiveStates')">✕</button>
-        </div>
 
         <hr>
 
-        <h3>2. Text Token Colorizer</h3>
+        <h3>3. Text Token Colorizer</h3>
         <div class="control-group" id="group-keywords">
             <input type="color" data-scope="keywords" id="cp-keywords" oninput="handleNativeColorInput('keywords', this.value)">
             <input type="text" class="hex-text-input" id="hex-keywords" maxlength="7" oninput="handleHexTextInput('keywords', this.value)">
