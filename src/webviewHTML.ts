@@ -32,8 +32,9 @@ export function getHtmlForWebview(): string {
                 border-color: var(--vscode-focusBorder, #007acc);
             }
             input[type="color"] {
-                --webkit-appearance: none;
-                background: transparent;
+                -webkit-appearance: none;
+                /* FIXED: Block background panel color bleeding by applying a solid opaque baseline */
+                background: var(--vscode-input-background, #1e1e1e) !important;
                 border: 1px solid var(--vscode-settings-textInputBorder, #444);
                 width: 24px;
                 height: 24px;
@@ -44,14 +45,17 @@ export function getHtmlForWebview(): string {
             }
             input[type="color"]::-webkit-color-swatch-wrapper {
                 padding: 0;
+                background-color: var(--vscode-input-background, #1e1e1e);
             }
             input[type="color"]::-webkit-color-swatch {
                 border: none;
             }
-            .theme-row.is-empty input[type="color"] {
-                opacity: 0.3; 
-                border: 1px dashed var(--vscode-panel-border, #888);
-                filter: grayscale(100%);
+
+            /* FIXED: Targeted your accurate control-group container wrappers */
+            .control-group.is-empty input[type="color"] {
+                border: 1px dashed var(--vscode-panel-border, #666);
+                /* FIXED: Use filters instead of opacity so it does not become transparent */
+                filter: grayscale(100%) brightness(0.5);
             }
 
             label { flex-grow: 1; font-size: 11px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -81,7 +85,7 @@ export function getHtmlForWebview(): string {
                 font-size: 10px;
                 width: 18px;
                 height: 18px;
-                display: none; /* Only show when modified */
+                display: none; 
                 align-items: center;
                 justify-content: center;
                 color: #ffffff !important;
@@ -193,11 +197,6 @@ export function getHtmlForWebview(): string {
                 z-index: 5;
             }
             .btn-delete-slot:hover { opacity: 1; background: var(--vscode-list-hoverBackground, #2a2d2e); }
-            .is-empty input[type="color"] {
-                opacity: 0.25; 
-                border-style: dashed;
-                filter: grayscale(100%);
-            }
         </style>
     </head>
     <body>
@@ -334,13 +333,24 @@ export function getHtmlForWebview(): string {
             
             let modificationSnapshots = {};
 
+            // FIXED: Synchronized initialization flow so placeholders stay un-overwritten
             document.querySelectorAll('input[type="color"]').forEach((el) => {
                 const scope = el.dataset.scope;
-                const value = (scope && state[scope]) ? state[scope] : '#000000';
-                el.value = value;
-                
+                const rowWrapper = el.closest('.control-group');
                 const txtInput = document.getElementById('hex-' + scope);
-                if (txtInput) { txtInput.value = value; }
+
+                if (scope && state[scope]) {
+                    el.value = state[scope];
+                    if (txtInput) { txtInput.value = state[scope]; }
+                    if (rowWrapper) { rowWrapper.classList.remove('is-empty'); }
+                } else {
+                    el.value = '#000000';
+                    if (txtInput) { 
+                        txtInput.value = ''; 
+                        txtInput.placeholder = '#------';
+                    }
+                    if (rowWrapper) { rowWrapper.classList.add('is-empty'); }
+                }
             });
             renderSlots();
 
@@ -352,7 +362,13 @@ export function getHtmlForWebview(): string {
                     document.querySelectorAll('input[type="color"]').forEach(el => {
                         el.value = '#000000';
                         const scope = el.dataset.scope;
-                        document.getElementById('hex-' + scope).value = '#000000';
+                        const txtInput = document.getElementById('hex-' + scope);
+                        if (txtInput) {
+                            txtInput.value = '';
+                            txtInput.placeholder = '#------';
+                        }
+                        const rowWrapper = el.closest('.control-group');
+                        if (rowWrapper) { rowWrapper.classList.add('is-empty'); }
                         toggleActionButtons(scope, false);
                     });
                     modificationSnapshots = {};
@@ -367,6 +383,8 @@ export function getHtmlForWebview(): string {
             function handleNativeColorInput(scope, color) {
                 ensureSnapshot(scope, () => {
                     document.getElementById('hex-' + scope).value = color;
+                    const rowWrapper = document.getElementById('cp-' + scope).closest('.control-group');
+                    if (rowWrapper) { rowWrapper.classList.remove('is-empty'); }
                     const type = ['keywords','strings','comments','punctuation','functions','variables'].includes(scope) ? 'updateToken' : 'updateFrame';
                     send(type, scope, color);
                 });
@@ -380,6 +398,8 @@ export function getHtmlForWebview(): string {
                 if (/^#[0-9A-F]{6}$/i.test(value)) {
                     ensureSnapshot(scope, () => {
                         document.getElementById('cp-' + scope).value = value;
+                        const rowWrapper = document.getElementById('cp-' + scope).closest('.control-group');
+                        if (rowWrapper) { rowWrapper.classList.remove('is-empty'); }
                         const type = ['keywords','strings','comments','punctuation','functions','variables'].includes(scope) ? 'updateToken' : 'updateFrame';
                         send(type, scope, value);
                     });
@@ -428,8 +448,23 @@ export function getHtmlForWebview(): string {
 
                 state[scope] = snap.uiStateColor;
                 vscode.setState(state);
-                document.getElementById('cp-' + scope).value = snap.domColor;
-                document.getElementById('hex-' + scope).value = snap.domColor;
+                
+                const cp = document.getElementById('cp-' + scope);
+                const txtInput = document.getElementById('hex-' + scope);
+                const rowWrapper = cp.closest('.control-group');
+
+                if (snap.uiStateColor && snap.uiStateColor !== '#000000') {
+                    cp.value = snap.domColor;
+                    if (txtInput) { txtInput.value = snap.domColor; }
+                    if (rowWrapper) { rowWrapper.classList.remove('is-empty'); }
+                } else {
+                    cp.value = '#000000';
+                    if (txtInput) {
+                        txtInput.value = '';
+                        txtInput.placeholder = '#------';
+                    }
+                    if (rowWrapper) { rowWrapper.classList.add('is-empty'); }
+                }
 
                 if (snap.workbenchSnapshot) {
                     vscode.postMessage({ type: 'revertColors', snapshot: snap.workbenchSnapshot });
@@ -501,12 +536,14 @@ export function getHtmlForWebview(): string {
                     const { uiState } = message;
 
                     if (uiState && uiState.isHardReset){
-                        const input = document.querySelectorAll('input[type="text"]');
+                        const input = document.querySelectorAll('.hex-text-input');
                         input.forEach(input =>{
                             input.value = '';
                             input.placeholder = '#------';
                             const colorPicker = input.previousElementSibling;
-                            if(colorPicker) colorPicker.style.background = '#000000';
+                            if(colorPicker) colorPicker.value = '#000000';
+                            const rowWrapper = input.closest('.control-group');
+                            if(rowWrapper) rowWrapper.classList.add('is-empty');
                         });
                     }
 
@@ -517,8 +554,7 @@ export function getHtmlForWebview(): string {
                     document.querySelectorAll('input[type="color"]').forEach((el) => {
                         const scope = el.dataset.scope;
                         const txtInput = document.getElementById('hex-' + scope);
-
-                        const rowWrapper = el.closest('.theme-row') || el.parentElement;
+                        const rowWrapper = el.closest('.control-group');
 
                         if (scope && state[scope]) {
                             el.value = state[scope];
@@ -529,12 +565,15 @@ export function getHtmlForWebview(): string {
                                 txtInput.value = ''; 
                                 txtInput.placeholder = '#------';
                             }                
-                            if(el) {
-                                el.value = '#000000';
-                            }
+                            if(el) { el.value = '#000000'; }
                             if(rowWrapper) rowWrapper.classList.add('is-empty');
                         }
                     });
+                    renderSlots();
+                } else if (message.type === 'updateLibrary') {
+                    savedSlots = message.savedSlots || [];
+                    state.savedSlots = savedSlots;
+                    vscode.setState(state);
                     renderSlots();
                 }
             });
