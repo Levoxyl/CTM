@@ -18,7 +18,7 @@
         {
           "id": "theme-maker-sidebar",
           "title": "Custom Theme Maker",
-          "icon": "$(paintcan)"
+          "icon": "rainbow-fill-svgrepo-com.svg"
         }
       ]
     },
@@ -26,6 +26,7 @@
       "theme-maker-sidebar": [
         {
           "type": "webview",
+          "icon": "rainbow-fill-svgrepo-com.svg", 
           "id": "theme-maker-view",
           "name": "Live Theme Editor"
         }
