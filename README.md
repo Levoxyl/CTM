@@ -7,6 +7,30 @@ If you want to have your own custom themes and switch between them ,whenever you
 
 
 ## ✨ Features
+The extension works fairly simple. It has an interactable UI that is easy to understand. Everything is written about *which* color changes *what*. You click the rctangle to open a color picker dropdown, where you can change between RGB, HEX or HSL types
+
+<p align="center">
+  <img width="316" height="285" alt="CTMColorDrop" src="https://github.com/user-attachments/assets/670e80d5-fd06-4fd8-a75a-702f6158f112" />
+</p>
+
+or you can type in the  HEX color of your choice in the input field right next to the color picker and can confirm or cancel your choice by the little buttons that appear to the right. 
+
+<p align="center">
+  <img width="316" height="83" alt="CTMColorChange" src="https://github.com/user-attachments/assets/f99fa661-2603-4998-9bb3-3c42822f728c" />
+</p>
+
+Managment is esential. Save the themes you just created....or delete them...
+
+<p align="center">
+  <img width="316" height="83" alt="CTMSaving" src="https://github.com/user-attachments/assets/6fdeacb8-09d7-45ed-8f76-f8ea913fc4b3" />
+</p>
+
+<br>
+<p align="center">
+  <img width="70%" alt="CTM" src="https://github.com/user-attachments/assets/3395867e-bb68-4098-b29d-be2cc19087ff" />
+</p>  
+<!-- width="1093" height="940" -->
+<br>
 
 * **Real-Time Workspace Syncing:** Modify colors via the native system color pickers and immediately view the changes live in your workspace without reloading windows.
 * **Intelligent Accent Cascading:** Smart mapping infrastructure that automatically propagates UI colors down to specific child dependencies (e.g., dynamically adjusting scrollbar active/hover transparency parameters, terminal output pipes, and sidebar states).
