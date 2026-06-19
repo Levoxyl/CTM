@@ -21,7 +21,7 @@ class ThemeViewProvider implements vscode.WebviewViewProvider {
             localResourceRoots: [this._context.extensionUri]
         };
 
-        webviewView.webview.html = getHtmlForWebview();
+       webviewView.webview.html = getHtmlForWebview(webviewView.webview, this._context.extensionUri);
 
         webviewView.webview.onDidReceiveMessage(async (data) => {
             const config = vscode.workspace.getConfiguration();
